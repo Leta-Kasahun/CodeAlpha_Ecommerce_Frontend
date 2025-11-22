@@ -17,41 +17,241 @@ A modern and responsive **Next.js 16 frontend** for the **CodeAlpha E-Commerce P
 
 ---
 ```
-CodeAlpha_Ecommerce_Frontend/
+codealpha-ecommerce-frontend/
 │
-├── public/
-│ # Static assets (images, icons, fonts)
+├── app/                            # Next.js 16 App Router
+│   ├── (auth)/                     # Authentication group
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── register/
+│   │   │   └── page.tsx
+│   │   ├── verify-otp/
+│   │   │   └── page.tsx
+│   │   ├── forgot-password/
+│   │   │   └── page.tsx
+│   │   └── layout.tsx
+│   │
+│   ├── (dashboard)/                # Dashboard group
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                # Dashboard home
+│   │   ├── profile/
+│   │   │   └── page.tsx
+│   │   ├── orders/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── page.tsx
+│   │   ├── addresses/
+│   │   │   └── page.tsx
+│   │   ├── wishlist/
+│   │   │   └── page.tsx
+│   │   └── seller/                 # Seller dashboard
+│   │       ├── layout.tsx
+│   │       ├── page.tsx
+│   │       ├── products/
+│   │       │   ├── page.tsx
+│   │       │   ├── new/
+│   │       │   │   └── page.tsx
+│   │       │   └── [id]/
+│   │       │       ├── page.tsx
+│   │       │       └── edit.tsx
+│   │       ├── orders/
+│   │       │   └── page.tsx
+│   │       └── analytics/
+│   │           └── page.tsx
+│   │
+│   ├── cart/
+│   │   └── page.tsx
+│   │
+│   ├── checkout/
+│   │   └── page.tsx
+│   │
+│   ├── products/
+│   │   ├── page.tsx
+│   │   └── [id]/
+│   │       └── page.tsx
+│   │
+│   ├── search/
+│   │   └── page.tsx
+│   │
+│   ├── api/                        # Frontend API routes
+│   │   ├── auth/
+│   │   │   └── route.ts
+│   │   ├── cart/
+│   │   │   └── route.ts
+│   │   └── webhooks/
+│   │       └── route.ts
+│   │
+│   ├── layout.tsx                  # Root layout
+│   ├── page.tsx                    # Homepage
+│   ├── loading.tsx                 # Loading UI
+│   ├── error.tsx                   # Error boundary
+│   └── not-found.tsx               # 404 page
 │
-├── src/
-│ ├── app/
-│ │ ├── layout.js
-│ │ ├── page.js
-│ │ └── globals.css
-│ │
-│ ├── components/
-│ │ ├── Header.js
-│ │ ├── Footer.js
-│ │ ├── ProductCard.js
-│ │ └── CartItem.js
-│ │
-│ ├── hooks/
-│ │ └── useCart.js
-│ │
-│ ├── services/
-│ │ └── api.js
-│ │
-│ ├── pages/
-│ │ ├── login.js
-│ │ ├── register.js
-│ │ ├── products/[id].js
-│ │ └── cart.js
-│ │
-│ └── utils/
-│ └── formatCurrency.js
+├── components/                     # Reusable components
+│   ├── ui/                         # shadcn/ui components
+│   │   ├── button.tsx
+│   │   ├── input.tsx
+│   │   ├── card.tsx
+│   │   ├── dialog.tsx
+│   │   ├── dropdown-menu.tsx
+│   │   ├── form.tsx
+│   │   ├── table.tsx
+│   │   ├── badge.tsx
+│   │   ├── avatar.tsx
+│   │   ├── skeleton.tsx
+│   │   └── ... (all shadcn components)
+│   │
+│   ├── layout/                     # Layout components
+│   │   ├── header.tsx
+│   │   ├── footer.tsx
+│   │   ├── sidebar.tsx
+│   │   ├── mobile-nav.tsx
+│   │   └── provider.tsx            # Context providers
+│   │
+│   ├── auth/                       # Auth components
+│   │   ├── login-form.tsx
+│   │   ├── register-form.tsx
+│   │   ├── otp-form.tsx
+│   │   └── protected-route.tsx
+│   │
+│   ├── product/                    # Product components
+│   │   ├── product-card.tsx
+│   │   ├── product-grid.tsx
+│   │   ├── product-details.tsx
+│   │   ├── product-images.tsx
+│   │   ├── product-reviews.tsx
+│   │   ├── review-form.tsx
+│   │   ├── add-to-cart.tsx
+│   │   └── quantity-selector.tsx
+│   │
+│   ├── cart/                       # Cart components
+│   │   ├── cart-item.tsx
+│   │   ├── cart-sidebar.tsx
+│   │   ├── cart-summary.tsx
+│   │   └── cart-badge.tsx
+│   │
+│   ├── order/                      # Order components
+│   │   ├── order-card.tsx
+│   │   ├── order-summary.tsx
+│   │   ├── order-timeline.tsx
+│   │   └── order-filters.tsx
+│   │
+│   ├── search/                     # Search components
+│   │   ├── search-bar.tsx
+│   │   ├── search-suggestions.tsx
+│   │   ├── filter-sidebar.tsx
+│   │   ├── sort-dropdown.tsx
+│   │   └── pagination.tsx
+│   │
+│   ├── checkout/                   # Checkout components
+│   │   ├── checkout-steps.tsx
+│   │   ├── address-form.tsx
+│   │   ├── payment-method.tsx
+│   │   └── order-review.tsx
+│   │
+│   ├── dashboard/                  # Dashboard components
+│   │   ├── stats-cards.tsx
+│   │   ├── recent-orders.tsx
+│   │   ├── quick-actions.tsx
+│   │   └── charts/
+│   │       ├── sales-chart.tsx
+│   │       └── revenue-chart.tsx
+│   │
+│   └── forms/                      # Form components
+│       ├── product-form.tsx
+│       ├── profile-form.tsx
+│       ├── address-form.tsx
+│       └── review-form.tsx
 │
-├── .gitignore
+├── lib/                            # Utilities & configurations
+│   ├── api/                        # API services
+│   │   ├── auth.ts
+│   │   ├── products.ts
+│   │   ├── cart.ts
+│   │   ├── orders.ts
+│   │   ├── payments.ts
+│   │   ├── reviews.ts
+│   │   ├── search.ts
+│   │   ├── users.ts
+│   │   └── index.ts
+│   │
+│   ├── hooks/                      # Custom React hooks
+│   │   ├── use-auth.ts
+│   │   ├── use-cart.ts
+│   │   ├── use-products.ts
+│   │   ├── use-orders.ts
+│   │   ├── use-search.ts
+│   │   ├── use-debounce.ts
+│   │   ├── use-local-storage.ts
+│   │   └── index.ts
+│   │
+│   ├── utils/                      # Utility functions
+│   │   ├── cn.ts                   # Classname utilities
+│   │   ├── formatters.ts           # Price, date formatters
+│   │   ├── validators.ts           # Form validation
+│   │   ├── constants.ts            # App constants
+│   │   └── index.ts
+│   │
+│   ├── contexts/                   # React contexts
+│   │   ├── auth-context.tsx
+│   │   ├── cart-context.tsx
+│   │   ├── theme-context.tsx
+│   │   └── index.ts
+│   │
+│   └── validations/                # Form validations
+│       ├── auth-schema.ts
+│       ├── product-schema.ts
+│       ├── order-schema.ts
+│       └── index.ts
+│
+├── types/                          # TypeScript type definitions
+│   ├── api.ts                      # API response types
+│   ├── auth.ts                     # Authentication types
+│   ├── product.ts                  # Product types
+│   ├── cart.ts                     # Cart types
+│   ├── order.ts                    # Order types
+│   ├── user.ts                     # User types
+│   └── index.ts
+│
+├── store/                          # State management (Zustand)
+│   ├── auth-store.ts
+│   ├── cart-store.ts
+│   ├── product-store.ts
+│   ├── ui-store.ts
+│   └── index.ts
+│
+├── styles/                         # Global styles
+│   ├── globals.css
+│   └── components.css
+│
+├── public/                         # Static assets
+│   ├── images/
+│   │   ├── logo.png
+│   │   ├── logo-dark.png
+│   │   ├── placeholder-product.jpg
+│   │   └── heroes/
+│   │       ├── home-hero.jpg
+│   │       └── auth-hero.jpg
+│   │
+│   ├── icons/
+│   │   ├── cart.svg
+│   │   ├── user.svg
+│   │   └── search.svg
+│   │
+│   └── favicon.ico
+│
+├── config/                         # App configurations
+│   ├── site.ts                     # Site metadata
+│   ├── api.ts                      # API configuration
+│   └── theme.ts                    # Theme configuration
+│
+├── middleware.ts                   # Next.js middleware
+├── next.config.ts                  # Next.js configuration
+├── tailwind.config.ts              # Tailwind CSS configuration
+├── components.json                 # shadcn/ui configuration
+├── postcss.config.js               # PostCSS configuration
+├── tsconfig.json                   # TypeScript configuration
 ├── package.json
-├── tailwind.config.js
 └── README.md
 ```
 
