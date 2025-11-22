@@ -1,19 +1,148 @@
-# 🛍️ CodeAlpha E-Commerce Frontend
+# 🛍️ CodeAlpha E-Commerce Platform
 
-A modern and responsive **Next.js 16 frontend** for the **CodeAlpha E-Commerce Platform**, designed to connect seamlessly with the live backend API. Built with love for **CodeAlpha Internship**, it allows users to browse products, manage shopping carts and orders, process payments, leave reviews, and interact with sellers.  
-
----
-
-## 🎯 Project Objectives
-
-- Provide a complete e-commerce shopping experience through a responsive web interface.  
-- Integrate fully with a live backend API to handle authentication, product management, cart operations, orders, payments, and reviews.  
-- Allow users to upgrade to sellers, manage shop profiles, and sell products online.  
-- Deliver a scalable and maintainable codebase using modern web development practices.  
+A complete full-stack e-commerce solution built with modern technologies for the **CodeAlpha Full Stack Development Internship**.
 
 ---
 
-## 📁 Folder Structure
+## 📋 Table of Contents
+
+- [Project Overview](#project-overview)  
+- [Core Objectives](#core-objectives)  
+- [Main Features](#main-features)  
+- [User Flow](#user-flow)  
+- [Tech Stack](#tech-stack)  
+- [Project Structure](#project-structure)  
+- [Configuration](#configuration)  
+- [Installation](#installation)  
+- [API Documentation](#api-documentation)  
+- [Contact](#contact)  
+- [License](#license)  
+
+---
+
+## 🎯 Project Overview
+
+**CodeAlpha E-Commerce Platform** is a comprehensive online shopping solution that provides a seamless experience from product discovery to order fulfillment. The platform supports multiple user roles (customers and sellers) and includes advanced features like real-time search, payment processing, and order management.
+
+---
+
+## 🎯 Core Objectives
+
+- Provide a modern, responsive e-commerce experience  
+- Support both B2C and C2C marketplace models  
+- Implement secure authentication and payment processing  
+- Offer advanced product discovery and filtering  
+- Enable sellers to manage their shops effectively  
+
+---
+
+## ⭐ Main Features
+
+### 🔐 Authentication & Security
+- User Registration with email OTP verification  
+- Secure Login/Logout with JWT tokens  
+- Password Reset functionality  
+- Role-based Access Control (Customer/Seller)  
+
+### 🛍️ Core E-Commerce
+- Product Catalog with advanced filtering and search  
+- Shopping Cart with persistent storage  
+- Order Management with status tracking  
+- Payment Processing simulation  
+- Product Reviews & Ratings system  
+
+### 🔍 Discovery & Search
+- Real-time Search with suggestions  
+- Advanced Filtering by category, price, ratings  
+- Multiple Sorting options (price, date, popularity)  
+- Popular Searches and trending products  
+
+### 👥 User Management
+- User Profiles with address management  
+- Order History with advanced filtering  
+- Wishlist functionality  
+- Seller Dashboard for shop management  
+
+### 🏪 Seller Features
+- Seller Registration with shop profile  
+- Product Management (CRUD operations)  
+- Order Management for shop orders  
+- Sales Analytics and insights  
+
+---
+
+## 🔄 User Flow
+
+### 🛒 Customer Journey
+**Browse & Discover**  
+- View featured products on homepage  
+- Search products with real-time suggestions  
+- Filter and sort results  
+- View product details and reviews  
+
+**Shopping Cart**  
+- Add products to cart  
+- Manage quantities  
+- Save for later (wishlist)  
+
+**Checkout Process**  
+- Review cart items  
+- Select shipping address  
+- Choose payment method  
+- Complete order  
+
+**Post-Purchase**  
+- Track order status  
+- View order history  
+- Leave product reviews  
+- Manage returns  
+
+### 🏪 Seller Journey
+**Shop Setup**  
+- Register as seller  
+- Create shop profile  
+- Set up payment information  
+
+**Product Management**  
+- Add new products  
+- Manage inventory  
+- Update product information  
+- Handle product categories  
+
+**Order Management**  
+- View incoming orders  
+- Update order status  
+- Process shipments  
+- Manage customer communications  
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend (Next.js 16 + TypeScript)
+- **Framework:** Next.js 16 with App Router  
+- **Language:** TypeScript for type safety  
+- **Styling:** Tailwind CSS + shadcn/ui components  
+- **State Management:** Zustand  
+- **Forms:** React Hook Form + Zod validation  
+- **Charts:** Recharts for analytics  
+
+### Backend (Node.js + Express)
+- **Runtime:** Node.js with Express.js  
+- **Database:** MongoDB with Mongoose ODM  
+- **Authentication:** JWT + bcrypt  
+- **Email:** Nodemailer for OTP and notifications  
+- **Deployment:** Render  
+
+### Development Tools
+- **Version Control:** Git + GitHub  
+- **API Testing:** Postman/Thunder Client  
+- **Package Manager:** npm  
+- **Code Quality:** ESLint + Prettier  
+
+---
+
+## 📁 Project Structure
 
 ---
 ```
@@ -257,75 +386,102 @@ codealpha-ecommerce-frontend/
 
 ---
 
-## ⚡ Main Functionalities
-
-- **User Authentication & Profile Management**  
-  Register, login, and update profiles.  
-
-- **Product Catalog & Search**  
-  Browse products, view details, and search by category, price, or name.  
-
-- **Shopping Cart & Orders**  
-  Add, update, or remove items from the cart and place orders.  
-
-- **Payment Processing**  
-  Complete transactions through integrated payment endpoints.  
-
-- **Reviews & Ratings**  
-  Add, view, and update product reviews.  
-
-- **Seller Marketplace**  
-  Upgrade to seller, manage shop profile, and sell products.  
-
----
-
-## 🔗 Backend API Endpoints
-
-| Feature | Method | Endpoint | Example Payload / Query |
-|---------|--------|----------|------------------------|
-| **User Registration** | POST | [Register](https://ca-ecommerce-api.onrender.com/api/auth/register) | `{ "name":"test user","email":"test@example.com","password":"123456","confirmPassword":"123456" }` |
-| **Verify OTP** | POST | [Verify OTP](https://ca-ecommerce-api.onrender.com/api/auth/verify-otp) | `{ "email":"test@example.com","otp":"123456" }` |
-| **Login** | POST | [Login](https://ca-ecommerce-api.onrender.com/api/auth/login) | `{ "email":"test@example.com","password":"123456" }` |
-| **User Profile** | GET | [Get Profile](https://ca-ecommerce-api.onrender.com/api/user-profile) | - |
-| **Update Profile** | PUT | [Update Profile](https://ca-ecommerce-api.onrender.com/api/user-profile) | `{ "name":"updated name","phone":"+251911223344","address":{"city":"addis ababa","postalCode":"1000","country":"ethiopia"} }` |
-| **Create Product** | POST | [Add Product](https://ca-ecommerce-api.onrender.com/api/products) | `{ "name":"wireless headphones","price":59.99,"quantity":15,"category":"electronics","description":"high-quality headphones","images":["headphone.jpg"] }` |
-| **Get All Products** | GET | [Products](https://ca-ecommerce-api.onrender.com/api/products) | - |
-| **Get Single Product** | GET | [Product Details](https://ca-ecommerce-api.onrender.com/api/products/PRODUCT_ID) | - |
-| **Update Product** | PUT | [Update Product](https://ca-ecommerce-api.onrender.com/api/products/PRODUCT_ID) | `{ "price":49.99,"quantity":10 }` |
-| **Search Products** | GET | [Search](https://ca-ecommerce-api.onrender.com/api/search/products?q=wireless&category=electronics&minPrice=20&maxPrice=100) | - |
-| **Popular Products** | GET | [Popular](https://ca-ecommerce-api.onrender.com/api/search/popular) | - |
-| **Add to Cart** | POST | [Add Cart](https://ca-ecommerce-api.onrender.com/api/cart/add) | `{ "productId":"PRODUCT_ID","quantity":2 }` |
-| **Get Cart** | GET | [Cart](https://ca-ecommerce-api.onrender.com/api/cart) | - |
-| **Update Cart** | PUT | [Update Cart](https://ca-ecommerce-api.onrender.com/api/cart/update/PRODUCT_ID) | `{ "quantity":3 }` |
-| **Remove from Cart** | DELETE | [Remove Item](https://ca-ecommerce-api.onrender.com/api/cart/remove/PRODUCT_ID) | - |
-| **Clear Cart** | DELETE | [Clear Cart](https://ca-ecommerce-api.onrender.com/api/cart/clear) | - |
-| **Create Order** | POST | [Place Order](https://ca-ecommerce-api.onrender.com/api/orders) | `{ "shippingAddress":{"city":"addis ababa","postalCode":"1000","country":"ethiopia"},"paymentMethod":"card" }` |
-| **Get Orders** | GET | [Orders](https://ca-ecommerce-api.onrender.com/api/orders) | - |
-| **Update Order Status** | PUT | [Update Status](https://ca-ecommerce-api.onrender.com/api/orders/ORDER_ID/status) | `{ "status":"shipped" }` |
-| **Payment** | POST | [Payments](https://ca-ecommerce-api.onrender.com/api/payments) | `{ "order":"ORDER_ID","amount":99.98,"method":"card" }` |
-| **Process Payment** | PUT | [Process Payment](https://ca-ecommerce-api.onrender.com/api/payments/PAYMENT_ID/process) | `{ "status":"success" }` |
-| **Payment History** | GET | [Payment History](https://ca-ecommerce-api.onrender.com/api/payments/history) | - |
-| **Product Reviews** | POST | [Add Review](https://ca-ecommerce-api.onrender.com/api/reviews) | `{ "product":"PRODUCT_ID","rating":5,"comment":"excellent product!" }` |
-| **Get Reviews** | GET | [Product Reviews](https://ca-ecommerce-api.onrender.com/api/reviews/product/PRODUCT_ID) | - |
-| **Update Review** | PUT | [Update Review](https://ca-ecommerce-api.onrender.com/api/reviews/REVIEW_ID) | `{ "rating":4,"comment":"very good quality" }` |
-| **Upgrade to Seller** | POST | [Seller Upgrade](https://ca-ecommerce-api.onrender.com/api/owners/upgrade) | `{ "shopName":"my tech store","phoneForOrders":"+251911223344","shopAddress":{"city":"addis ababa","postalCode":"1000","country":"ethiopia"} }` |
-| **Seller Profile** | GET | [Get Seller](https://ca-ecommerce-api.onrender.com/api/owners/profile) | - |
-| **Update Seller** | PUT | [Update Seller](https://ca-ecommerce-api.onrender.com/api/owners/profile) | `{ "phoneForOrders":"+251922334455" }` |
-
----
-
 ## 🚀 Installation & Setup
 
 1. **Clone the repository**
 ```bash
 git clone https://github.com/Leta-Kasahun/CodeAlpha_Ecommerce_Frontend.git
 cd CodeAlpha_Ecommerce_Frontend
+```
+---
+## 📚 API Documentation
 
-📄 License
+### Base URL
+[https://ca-ecommerce-api.onrender.com](https://ca-ecommerce-api.onrender.com)
 
-This project is licensed under the MIT License.
-✉️ Contact
+### Key Endpoints
 
-Email: letakasahun2@gmail.com
+- **Authentication:** [https://ca-ecommerce-api.onrender.com/api/auth/](https://ca-ecommerce-api.onrender.com/api/auth/)  
+- **Products:** [https://ca-ecommerce-api.onrender.com/api/products/](https://ca-ecommerce-api.onrender.com/api/products/)  
+- **Cart:** [https://ca-ecommerce-api.onrender.com/api/cart/](https://ca-ecommerce-api.onrender.com/api/cart/)  
+- **Orders:** [https://ca-ecommerce-api.onrender.com/api/orders/](https://ca-ecommerce-api.onrender.com/api/orders/)  
+- **Payments:** [https://ca-ecommerce-api.onrender.com/api/payments/](https://ca-ecommerce-api.onrender.com/api/payments/)  
+- **Search:** [https://ca-ecommerce-api.onrender.com/api/search/](https://ca-ecommerce-api.onrender.com/api/search/)  
+- **Users:** [https://ca-ecommerce-api.onrender.com/api/users/](https://ca-ecommerce-api.onrender.com/api/users/)  
 
-❤️ Built with love for CodeAlpha Internship
+---
+### 🗝️ Key Configurations
+
+- 🗄️ **Database:** MongoDB Atlas with connection pooling  
+- 🔐 **Authentication:** JWT with 7-day expiration  
+- 🌐 **CORS:** Configured for frontend domains  
+- ⏱️ **Rate Limiting:** Implemented for API protection  
+- ☁️ **File Upload:** Cloudinary integration ready  
+- ⚡ **API Base URL:** Points to backend for all frontend requests  
+- 🎨 **Styling:** Tailwind CSS + shadcn/ui  
+- 🛠️ **Forms & Validation:** React Hook Form + Zod  
+- 📊 **Charts & Analytics:** Recharts  
+- 🔄 **State Management:** Zustand  
+
+### 🚀 Setup Instructions
+```bash
+# Backend Setup
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with your configs
+npm run dev
+
+# Frontend Setup
+cd ../frontend
+npm install
+cp .env.local.example .env.local
+# Edit .env.local with your configs
+npm run dev
+```
+---
+## 📞 Contact
+
+### Project Developer
+**Leta Kasahun**  
+💌 Email: [letakasahun77@gmail.com](mailto:letakasahun77@gmail.com)  
+🔗 GitHub: [@letakasahun](https://github.com/letakasahun)  
+💼 LinkedIn: [Leta Kasahun](https://www.linkedin.com/in/leta-kasahun)  
+
+### CodeAlpha
+🌐 Website: [www.codealpha.tech](https://www.codealpha.tech)  
+💌 Email: [services@codealpha.tech](mailto:services@codealpha.tech)  
+📱 WhatsApp: +91 8052293611  
+
+---
+
+## 📄 License
+
+This project was developed as part of the **CodeAlpha Full Stack Development Internship** program. All rights reserved.  
+
+**Usage Rights:**  
+- Educational and portfolio use permitted  
+- Commercial use requires permission  
+- CodeAlpha internship submission  
+
+---
+
+## 🙏 Acknowledgments
+
+- CodeAlpha for the internship opportunity  
+- Mentors for guidance and support  
+- Open source community for amazing tools and libraries  
+
+---
+
+## 💝 Built with Love
+
+Crafted with ❤️ by **Leta Kasahun** for the **CodeAlpha Full Stack Development Internship**  
+
+**Special Thanks:**  
+To the entire CodeAlpha team for providing this incredible learning opportunity and supporting developers in their journey to become full-stack professionals.  
+
+> "Code is like humor. When you have to explain it, it's bad." – Cory House  
+
+Happy coding! 🚀
+
