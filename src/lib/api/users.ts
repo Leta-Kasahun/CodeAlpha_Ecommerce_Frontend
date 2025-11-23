@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { User, SellerProfile } from '@/types';
+import { User, SellerProfile } from '@/src/types';
 
 interface UpdateProfileData {
   name?: string;

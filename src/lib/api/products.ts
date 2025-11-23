@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { Product } from '@/types';
+import { Product } from '@/src/types';
 
 interface CreateProductData {
   name: string;

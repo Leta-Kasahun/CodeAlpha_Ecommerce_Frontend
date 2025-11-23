@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { Review } from '@/types';
+import { Review } from '@/src/types';
 
 interface CreateReviewData {
   product: string;

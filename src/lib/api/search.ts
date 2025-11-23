@@ -1,5 +1,5 @@
 import { apiConfig } from './config';
-import { Product } from '@/types';
+import { Product } from '../../types';
 
 interface SearchParams {
   q?: string;
@@ -27,7 +27,12 @@ export const searchAPI = {
   },
 
   getSearchSuggestions: async (params: SearchSuggestionsParams): Promise<string[]> => {
-    const queryParams = new URLSearchParams(params);
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, value.toString());
+      }
+    });
     return apiConfig.request(`/api/search/suggestions?${queryParams}`);
   },
 

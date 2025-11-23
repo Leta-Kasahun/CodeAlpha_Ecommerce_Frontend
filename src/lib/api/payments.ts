@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { Payment } from '@/types';
+import { Payment } from '@/src/types';
 
 interface CreatePaymentData {
   order: string;

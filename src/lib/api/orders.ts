@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { Order } from '@/types';
+import { Order } from '@/src/types';
 
 interface CreateOrderData {
   shippingAddress: {

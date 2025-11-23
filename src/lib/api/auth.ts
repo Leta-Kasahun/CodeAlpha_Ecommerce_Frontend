@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { User } from '@/types';
+import { User } from '@/src/types';
 
 interface LoginData {
   email: string;

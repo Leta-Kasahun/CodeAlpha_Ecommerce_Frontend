@@ -1,6 +1,6 @@
  
 import { apiConfig } from './config';
-import { Cart } from '@/types';
+import { Cart } from '@/src/types';
 
 interface AddToCartData {
   productId: string;
