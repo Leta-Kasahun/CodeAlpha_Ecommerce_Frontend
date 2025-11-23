@@ -7,11 +7,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import semantic tokens (ensure file exists at src/styles/tokens.css) */
-@import "../styles/tokens.css";
-
 :root {
-  /* legacy mappings + semantic tokens available across the app */
+  /* Your semantic color tokens */
+  --color-primary: #111111;
+  --color-primary-foreground: #FFFFFF;
+  --color-cta: #2563EB;
+  --color-cta-hover: #1D4ED8;
+  --color-warm-accent: #DC2626;
+  --color-success: #059669;
+  --color-border: #E5E7EB;
+  --color-text-muted: #4B5563;
+  --color-bg: #FFFFFF;
+  --color-bg-soft: #F3F4F6;
+  --color-focus-ring: rgba(29, 78, 216, 0.32);
+  --radius: 0.5rem;
+
+  /* Shadcn/ui compatible tokens */
   --background: var(--color-bg);
   --foreground: var(--color-primary);
   --card: var(--color-bg);
@@ -30,10 +41,8 @@
   --border: var(--color-border);
   --input: var(--color-bg);
   --ring: var(--color-focus-ring);
-  --radius: var(--radius);
 }
 
-/* Dark mode overrides (toggle by adding .dark to <html> or <body>) */
 .dark {
   --color-primary: #FFFFFF;
   --color-primary-foreground: #111111;
@@ -46,7 +55,6 @@
   --color-bg: #111111;
   --color-bg-soft: #0F172A;
   --color-focus-ring: rgba(37,99,235,0.2);
-  --radius: 0.625rem;
 
   --background: var(--color-bg);
   --foreground: var(--color-primary);
@@ -64,33 +72,52 @@
   --ring: var(--color-focus-ring);
 }
 
-/* Base layer rules */
 @layer base {
   * {
-    @apply border-border;
-    outline: none;
+    border-color: var(--border);
   }
 
   html, body {
-    @apply bg-background text-foreground;
+    background: var(--background);
+    color: var(--foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  .bg-soft { background-color: var(--color-bg-soft); }
-  .border-default { border-color: var(--color-border); }
-  .text-muted { color: var(--color-text-muted); }
-  .text-error { color: var(--color-warm-accent); }
-  .text-success { color: var(--color-success); }
+  .bg-soft { 
+    background-color: var(--color-bg-soft); 
+  }
+  
+  .border-default { 
+    border-color: var(--color-border); 
+  }
+  
+  .text-muted { 
+    color: var(--color-text-muted); 
+  }
+  
+  .text-error { 
+    color: var(--color-warm-accent); 
+  }
+  
+  .text-success { 
+    color: var(--color-success); 
+  }
 
   .btn-primary {
     background-color: var(--color-cta);
     color: var(--color-primary-foreground);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: background-color 0.2s;
   }
-  .btn-primary:hover { background-color: var(--color-cta-hover); }
+  
+  .btn-primary:hover { 
+    background-color: var(--color-cta-hover); 
+  }
 
   :focus-visible {
-    box-shadow: 0 0 0 4px var(--color-focus-ring);
+    box-shadow: 0 0 0 2px var(--color-focus-ring);
     border-radius: calc(var(--radius) - 2px);
   }
 
@@ -102,14 +129,15 @@
     border-radius: 0.375rem;
   }
 
-  a.cta { color: var(--color-cta); }
+  a.cta { 
+    color: var(--color-cta); 
+  }
 
   .overlay-cta {
     background: linear-gradient(180deg, rgba(37,99,235,0.12), rgba(29,78,216,0.08));
   }
 }
 
-/* Theme convenience tokens for component-level usage */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -127,6 +155,4 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
 }
