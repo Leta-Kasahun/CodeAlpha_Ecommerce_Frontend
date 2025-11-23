@@ -1,24 +1,29 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+// src/app/layout.tsx
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Header } from '@/src/components/layout/nav/Header';
+import { Footer } from '@/src/components/layout/footer/Footer';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Shopsphere - Modern E-Commerce',
-  description: 'Your one-stop destination for modern shopping experience',
-}
+  title: 'ShopSphere - Premium Fashion Store',
+  description: 'Your premier destination for fashion, accessories, and lifestyle products',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <Header />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
-  )
+  );
 }
