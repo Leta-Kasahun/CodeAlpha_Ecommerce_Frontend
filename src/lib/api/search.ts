@@ -1,5 +1,5 @@
 import { apiConfig } from './config';
-import { Product } from '../types';  // ✅ FIXED IMPORT PATH
+import { Product } from '@/src/types';  // ✅ USE THIS IMPORT PATH
 
 interface SearchParams {
   q?: string;
