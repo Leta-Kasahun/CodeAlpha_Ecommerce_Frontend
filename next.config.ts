@@ -1,7 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['ca-ecommerce-api.onrender.com', 'localhost:5000'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ca-ecommerce-api.onrender.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '5000',
+      },
+    ],
     unoptimized: true
   },
   env: {
