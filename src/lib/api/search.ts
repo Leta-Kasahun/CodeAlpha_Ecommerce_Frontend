@@ -17,22 +17,20 @@ interface SearchSuggestionsParams {
 export const searchAPI = {
   searchProducts: async (params: SearchParams): Promise<{ products: Product[]; total: number }> => {
     const queryParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        queryParams.append(key, value.toString());
-      }
-    });
+    
+    if (params.q) queryParams.append('q', params.q);
+    if (params.category) queryParams.append('category', params.category);
+    if (params.minPrice) queryParams.append('minPrice', params.minPrice.toString());
+    if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice.toString());
+    if (params.page) queryParams.append('page', params.page.toString());
+    if (params.limit) queryParams.append('limit', params.limit.toString());
     
     return apiConfig.request(`/api/search/products?${queryParams}`);
   },
 
   getSearchSuggestions: async (params: SearchSuggestionsParams): Promise<string[]> => {
     const queryParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        queryParams.append(key, value.toString());
-      }
-    });
+    queryParams.append('q', params.q);
     return apiConfig.request(`/api/search/suggestions?${queryParams}`);
   },
 
@@ -41,6 +39,9 @@ export const searchAPI = {
   },
 
   sortProducts: async (sortBy: string, sortOrder: 'asc' | 'desc' = 'asc'): Promise<Product[]> => {
-    return apiConfig.request(`/api/sort/products?sortBy=${sortBy}&sortOrder=${sortOrder}`);
+    const queryParams = new URLSearchParams();
+    queryParams.append('sortBy', sortBy);
+    queryParams.append('sortOrder', sortOrder);
+    return apiConfig.request(`/api/sort/products?${queryParams}`);
   },
 };
