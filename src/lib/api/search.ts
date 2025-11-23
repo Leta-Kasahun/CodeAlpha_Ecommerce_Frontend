@@ -1,5 +1,5 @@
 import { apiConfig } from './config';
-import { Product } from '../../types';
+import { Product } from '../types';  // ✅ FIXED IMPORT PATH
 
 interface SearchParams {
   q?: string;
@@ -24,16 +24,15 @@ export const searchAPI = {
     if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice.toString());
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
-    
     return apiConfig.request(`/api/search/products?${queryParams}`);
   },
-
+  
   getSearchSuggestions: async (params: SearchSuggestionsParams): Promise<string[]> => {
     const queryParams = new URLSearchParams();
     queryParams.append('q', params.q);
     return apiConfig.request(`/api/search/suggestions?${queryParams}`);
   },
-
+  
   getPopularSearches: async (): Promise<string[]> => {
     return apiConfig.request('/api/search/popular');
   },
