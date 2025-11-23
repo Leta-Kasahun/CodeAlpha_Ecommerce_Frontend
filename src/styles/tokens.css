@@ -1,0 +1,19 @@
+:root {
+  /* Semantic color tokens */
+  --color-primary: #111111;        /* main chrome / headings */
+  --color-primary-foreground: #FFFFFF;   /* text on dark surfaces */
+  --color-cta: #2563EB;            /* primary CTA */
+  --color-cta-hover: #1D4ED8;      /* CTA hover/active */
+  --color-warm-accent: #DC2626;    /* destructive / sale */
+  --color-success: #059669;        /* success */
+  --color-border: #E5E7EB;         /* borders / dividers */
+  --color-text-muted: #4B5563;     /* secondary copy */
+  --color-bg: #FFFFFF;             /* main background / surface */
+  --color-bg-soft: #F3F4F6;        /* soft page background */
+
+  /* Focus ring token (semi-opaque CTA hover) */
+  --color-focus-ring: rgba(29, 78, 216, 0.32);
+
+  /* Radius */
+  --radius: 0.625rem;
+}
