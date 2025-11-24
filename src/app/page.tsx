@@ -5,6 +5,7 @@ import { FeaturedProducts } from '@/src/components/home/FeaturedProducts';
 import { PromoBanner } from '@/src/components/home/PromoBanner';
 import { Testimonials } from '@/src/components/home/Testimonials';
 import { Newsletter } from '@/src/components/home/Newsletter';
+import { PeopleAlsoAsk } from '@/src/components/home/PeopleAsoAsk';
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <FeaturedProducts />
       <PromoBanner />
       <Testimonials />
+      <PeopleAlsoAsk />
       <Newsletter />
     </div>
   );

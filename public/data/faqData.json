@@ -1,0 +1,75 @@
+
+{
+  "faqItems": [
+    {
+      "id": 1,
+      "question": "What's the difference between traditional and tech wear?",
+      "answer": "Traditional wear focuses on cultural craftsmanship and heritage designs, while tech wear uses smart fabrics with moisture-wicking, temperature control, and modern functionality for active lifestyles.",
+      "icon": "ShoppingBag",
+      "category": "products"
+    },
+    {
+      "id": 2,
+      "question": "How do I care for traditional clothing?",
+      "answer": "Most traditional pieces require gentle hand washing or dry cleaning. We provide specific care instructions with each item to maintain their quality and cultural authenticity.",
+      "icon": "RefreshCw",
+      "category": "care"
+    },
+    {
+      "id": 3,
+      "question": "Are your products authentic and ethically made?",
+      "answer": "Yes! Our traditional pieces are crafted by skilled artisans, and our tech wear is produced in ethical factories. We're committed to fair trade and sustainable practices.",
+      "icon": "Shield",
+      "category": "quality"
+    },
+    {
+      "id": 4,
+      "question": "Do you offer custom sizing for traditional wear?",
+      "answer": "We offer custom sizing for select traditional pieces. Contact our support team with your measurements for personalized fitting options.",
+      "icon": "Package",
+      "category": "sizing"
+    },
+    {
+      "id": 5,
+      "question": "What makes your tech wear 'smart'?",
+      "answer": "Our tech wear features advanced fabrics with odor resistance, quick-dry technology, and ergonomic designs perfect for modern, active lifestyles.",
+      "icon": "Star",
+      "category": "tech"
+    },
+    {
+      "id": 6,
+      "question": "What payment methods do you accept?",
+      "answer": "We accept all major credit/debit cards (Visa, MasterCard, American Express), bank transfers, and cash on delivery in selected areas.",
+      "icon": "CreditCard",
+      "category": "payments"
+    },
+    {
+      "id": 7,
+      "question": "Is it safe to use my credit card on your site?",
+      "answer": "Absolutely! We use bank-level SSL encryption and PCI-DSS compliance. Your payment information is never stored on our servers.",
+      "icon": "Shield",
+      "category": "security"
+    },
+    {
+      "id": 8,
+      "question": "How long does shipping take?",
+      "answer": "Standard shipping: 3-5 business days. Express: 1-2 days. International: 7-14 days. Free shipping on orders over $99.",
+      "icon": "Truck",
+      "category": "shipping"
+    },
+    {
+      "id": 9,
+      "question": "Do you offer international shipping?",
+      "answer": "Yes! We ship to 50+ countries worldwide. Shipping costs and delivery times vary by location.",
+      "icon": "Truck",
+      "category": "shipping"
+    },
+    {
+      "id": 10,
+      "question": "How often do you release new collections?",
+      "answer": "We launch seasonal collections every 3 months, with limited edition drops monthly. Follow us for early access to new arrivals.",
+      "icon": "Tag",
+      "category": "collections"
+    }
+  ]
+}
