@@ -1,44 +1,85 @@
- 
+// src/lib/api/auth.ts
 import { apiConfig } from './config';
-import { Cart } from '@/src/types';
+import { User } from '@/src/types';
 
-interface AddToCartData {
-  productId: string;
-  quantity?: number;
+interface LoginData {
+  email: string;
+  password: string;
 }
 
-interface UpdateCartItemData {
-  quantity: number;
+interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string; // Add this
 }
 
-export const cartAPI = {
-  getCart: async (token: string): Promise<Cart> => {
-    return apiConfig.authRequest('/api/cart', token);
-  },
+interface VerifyOTPData {
+  email: string;
+  otp: string;
+}
 
-  addToCart: async (data: AddToCartData, token: string): Promise<Cart> => {
-    return apiConfig.authRequest('/api/cart/add', token, {
+interface ForgotPasswordData {
+  email: string;
+}
+
+interface VerifyResetOTPData {
+  email: string;
+  otp: string;
+}
+
+interface ResetPasswordData {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
+
+export const authAPI = {
+  login: async (data: LoginData): Promise<{ user: User; token: string }> => {
+    return apiConfig.request('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  updateCartItem: async (productId: string, data: UpdateCartItemData, token: string): Promise<Cart> => {
-    return apiConfig.authRequest(`/api/cart/update/${productId}`, token, {
-      method: 'PUT',
+  register: async (data: RegisterData): Promise<{ message: string }> => {
+    return apiConfig.request('/api/auth/register', {
+      method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  removeFromCart: async (productId: string, token: string): Promise<Cart> => {
-    return apiConfig.authRequest(`/api/cart/remove/${productId}`, token, {
-      method: 'DELETE',
+  verifyOTP: async (data: VerifyOTPData): Promise<{ user: User; token: string }> => {
+    return apiConfig.request('/api/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 
-  clearCart: async (token: string): Promise<{ message: string }> => {
-    return apiConfig.authRequest('/api/cart/clear', token, {
-      method: 'DELETE',
+  logout: async (token: string): Promise<{ message: string }> => {
+    return apiConfig.authRequest('/api/auth/logout', token, {
+      method: 'POST',
+    });
+  },
+
+  forgotPassword: async (data: ForgotPasswordData): Promise<{ message: string }> => {
+    return apiConfig.request('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  verifyResetOTP: async (data: VerifyResetOTPData): Promise<{ message: string }> => {
+    return apiConfig.request('/api/auth/verify-reset-otp', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  resetPassword: async (data: ResetPasswordData): Promise<{ message: string }> => {
+    return apiConfig.request('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 };

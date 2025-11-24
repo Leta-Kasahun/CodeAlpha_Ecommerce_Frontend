@@ -39,12 +39,16 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   email: z.string()
     .email('Please enter a valid email address'),
-  otp: z.string()
-    .length(6, 'OTP must be exactly 6 digits')
-    .regex(/^\d+$/, 'OTP must contain only numbers'),
+  resetToken: z.string() // Changed from otp to resetToken
+    .length(6, 'Reset token must be exactly 6 digits')
+    .regex(/^\d+$/, 'Reset token must contain only numbers'),
   newPassword: z.string()
     .min(6, 'Password must be at least 6 characters')
-    .max(100, 'Password must be less than 100 characters')
+    .max(100, 'Password must be less than 100 characters'),
+  confirmPassword: z.string() // Added to match backend
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;

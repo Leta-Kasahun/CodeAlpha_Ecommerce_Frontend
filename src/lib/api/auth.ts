@@ -1,4 +1,4 @@
- 
+// src/lib/api/auth.ts
 import { apiConfig } from './config';
 import { User } from '@/src/types';
 
@@ -29,8 +29,9 @@ interface VerifyResetOTPData {
 
 interface ResetPasswordData {
   email: string;
-  otp: string;
+  resetToken: string;
   newPassword: string;
+  confirmPassword: string;
 }
 
 export const authAPI = {
@@ -68,7 +69,11 @@ export const authAPI = {
     });
   },
 
-  verifyResetOTP: async (data: VerifyResetOTPData): Promise<{ message: string }> => {
+  verifyResetOTP: async (data: VerifyResetOTPData): Promise<{ 
+    success: boolean; 
+    message: string; 
+    resetToken: string 
+  }> => {
     return apiConfig.request('/api/auth/verify-reset-otp', {
       method: 'POST',
       body: JSON.stringify(data),

@@ -1,10 +1,5 @@
 // src/app/(auth)/verify-otp/page.tsx
-import { VerifyOTPForm } from './_components/VerifyOTPForm';
-
-export default function VerifyOTPPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <VerifyOTPForm />
-    </div>
-  );
+import { VerifyOTPPage } from '@/src/components/auth/VerifyOTPPage';
+export default function VerifyOTPPageRoute() {
+  return <VerifyOTPPage />;
 }
