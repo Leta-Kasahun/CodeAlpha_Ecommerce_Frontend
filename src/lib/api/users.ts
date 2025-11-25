@@ -1,4 +1,6 @@
- 
+// src/lib/api/users.ts
+// User API functions including owner upgrade capabilities
+
 import { apiConfig } from './config';
 import { User, SellerProfile } from '@/src/types';
 
@@ -20,6 +22,26 @@ interface UpgradeToOwnerData {
     postalCode: string;
     country: string;
   };
+  demoPayoutNumber?: string;
+  bankName?: string;
+}
+
+interface UpgradeToOwnerResponse {
+  success: boolean;
+  message: string;
+  user: User;
+  sellerProfile: SellerProfile;
+}
+
+interface GetOwnerProfileResponse {
+  success: boolean;
+  sellerProfile: SellerProfile;
+}
+
+interface UpdateOwnerProfileResponse {
+  success: boolean;
+  message: string;
+  sellerProfile: SellerProfile;
 }
 
 export const usersAPI = {
@@ -34,18 +56,18 @@ export const usersAPI = {
     });
   },
 
-  upgradeToOwner: async (data: UpgradeToOwnerData, token: string): Promise<SellerProfile> => {
+  upgradeToOwner: async (data: UpgradeToOwnerData, token: string): Promise<UpgradeToOwnerResponse> => {
     return apiConfig.authRequest('/api/owners/upgrade', token, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  getOwnerProfile: async (token: string): Promise<SellerProfile> => {
+  getOwnerProfile: async (token: string): Promise<GetOwnerProfileResponse> => {
     return apiConfig.authRequest('/api/owners/profile', token);
   },
 
-  updateOwnerProfile: async (data: Partial<UpgradeToOwnerData>, token: string): Promise<SellerProfile> => {
+  updateOwnerProfile: async (data: Partial<UpgradeToOwnerData>, token: string): Promise<UpdateOwnerProfileResponse> => {
     return apiConfig.authRequest('/api/owners/profile', token, {
       method: 'PUT',
       body: JSON.stringify(data),

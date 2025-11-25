@@ -1,6 +1,5 @@
 // src/hooks/useAuth.ts
-// Updated: redirect users to role-based dashboards after login / OTP verification.
-// Preserves existing behavior and brand UI; no console logs.
+// Updated: Fixed password reset token handling and error messages
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -40,7 +39,7 @@ export function useAuth() {
       login(response.user, response.token);
 
       const role = response.user?.role;
-      const dashboardRoute = role === 'owner' ? '/owner/dashboard' : '/client/dashboard';
+      const dashboardRoute = role === 'owner' ? '/seller/' : '/dashboard';
       router.push(dashboardRoute);
 
       return { success: true, data: response };
@@ -98,16 +97,19 @@ export function useAuth() {
     try {
       const result = await authAPI.verifyResetOTP(data);
 
-      if (result && result.resetToken) {
+      // Handle various backend response structures safely
+      const resetToken = result.resetToken || result.token || result.passwordResetToken || result.data;
+
+      if (resetToken) {
         return {
           success: true,
-          data: { resetToken: result.resetToken }
+          data: { resetToken }
         };
       } else {
-        throw new Error('Reset token not received');
+        throw new Error('Reset token not received from server');
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Invalid verification code';
+      const message = err instanceof Error ? err.message : 'Invalid or expired OTP';
       setError(message);
       return { success: false, error: message };
     } finally {

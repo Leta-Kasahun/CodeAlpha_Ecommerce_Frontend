@@ -10,7 +10,7 @@ import { Input } from '@/src/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/components/ui/card';
 import Link from 'next/link';
 import { Lock, Eye, EyeOff, KeyRound } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 export function ResetPasswordForm() {
@@ -25,27 +25,22 @@ export function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isValid },
+    setValue
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
-    defaultValues: {
-      email,
-      resetToken
-    }
+    mode: 'onChange'
   });
 
+  // Set email and resetToken values when component mounts
+  useEffect(() => {
+    if (email) setValue('email', email);
+    if (resetToken) setValue('resetToken', resetToken);
+  }, [email, resetToken, setValue]);
+
   const onSubmit = async (data: ResetPasswordFormData) => {
-    const tokenFromForm = data.resetToken ?? resetToken;
-    const normalizedToken = tokenFromForm ? decodeURIComponent(String(tokenFromForm)).trim() : '';
-
-    const payload = {
-      ...data,
-      email: data.email ?? email,
-      resetToken: normalizedToken
-    };
-
-    const result = await handleResetPassword(payload);
-
+    const result = await handleResetPassword(data);
+    
     if (result.success) {
       router.push('/login');
     }
@@ -65,6 +60,7 @@ export function ResetPasswordForm() {
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Hidden fields for email and resetToken */}
           <input type="hidden" {...register('email')} />
           <input type="hidden" {...register('resetToken')} />
 
@@ -120,10 +116,10 @@ export function ResetPasswordForm() {
 
           <button
             type="submit"
-            disabled={loading || isSubmitting}
+            disabled={loading || !isValid}
             className="w-full h-14 px-4 py-2 bg-[#5156D2] text-white rounded-lg font-semibold text-lg hover:bg-[#3f43b3] focus:outline-none focus:ring-2 focus:ring-[#5156D2] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3"
           >
-            {loading || isSubmitting ? (
+            {loading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Resetting Password...
