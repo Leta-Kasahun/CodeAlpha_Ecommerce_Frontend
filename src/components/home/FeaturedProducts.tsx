@@ -8,9 +8,10 @@ import { useRouter } from 'next/navigation'
 import { ShoppingCart } from 'lucide-react'
 import { productsAPI } from '@/src/lib/api/products'
 import { useCartStore } from '@/src/stores'
+import { Product } from '@/src/types' 
 
 export function FeaturedProducts() {
-  const [products, setProducts] = useState([])
+const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const { addItem } = useCartStore()
@@ -33,7 +34,7 @@ export function FeaturedProducts() {
     loadFeaturedProducts()
   }, [])
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (product:Product) => {
     addItem(product, 1)
   }
 

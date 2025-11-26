@@ -4,7 +4,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ShoppingCart, Check, Loader } from 'lucide-react'
+import { ShoppingCart, Check, Loader2 } from 'lucide-react'
 import { useCart } from '@/src/hooks/useCart'
 import { Button } from '@/src/components/ui/button'
 
@@ -55,7 +55,7 @@ export function AddToCartButton({
       } transition-all duration-300 flex items-center space-x-2`}
     >
       {loading ? (
-        <Loader className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : added ? (
         <Check className="h-4 w-4" />
       ) : (

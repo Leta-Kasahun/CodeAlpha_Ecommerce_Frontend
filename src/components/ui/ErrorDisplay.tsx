@@ -1,21 +1,18 @@
-// src/components/ui/ErrorDisplay.tsx
-import { AlertCircle } from 'lucide-react';
+// Error display component without cn dependency
+// Path: src/components/ui/ErrorDisplay.tsx
+
+import { AlertCircle } from 'lucide-react'
 
 interface ErrorDisplayProps {
-  error: string;
-  className?: string;
+  message: string
+  className?: string
 }
 
-export function ErrorDisplay({ error, className }: ErrorDisplayProps) {
-  if (!error) return null;
-
+export function ErrorDisplay({ message, className = '' }: ErrorDisplayProps) {
   return (
-    <div className={cn(
-      'flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm',
-      className
-    )}>
+    <div className={`flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm ${className}`}>
       <AlertCircle className="h-4 w-4 flex-shrink-0" />
-      <span>{error}</span>
+      <span>{message}</span>
     </div>
-  );
+  )
 }

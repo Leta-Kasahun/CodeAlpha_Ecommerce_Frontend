@@ -1,56 +1,77 @@
-// src/components/layout/nav/SearchBar.tsx
 'use client';
 
-import { useState, useRef } from 'react';
-import { Search, X } from 'lucide-react';
-import { searchAPI } from '@/src/lib/api';
-import { useProductStore } from '@/src/stores';
+import React, { useRef, useState, useEffect } from 'react';
+import { Search, X, Loader2 } from 'lucide-react';
+import { useSearch } from '@/src/hooks/useSearch';
 
-export function SearchBar() {
+export default function SearchBar() {
   const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { setProducts } = useProductStore();
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const { getSuggestions } = useSearch();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleInputChange = (value: string) => {
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleInputChange = async (value: string) => {
     setQuery(value);
-    
-    // Clear previous timeout
+    setIsLoading(true);
+
+    // Clear any existing debounce timer
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    // Set new timeout for suggestions
-    if (value.trim()) {
-      timeoutRef.current = setTimeout(async () => {
-        setIsLoading(true);
-        try {
-          const suggestionsData = await searchAPI.getSearchSuggestions({ q: value });
-          setSuggestions(suggestionsData);
-        } catch (error) {
-          console.error('Search suggestions error:', error);
-          setSuggestions([]);
-        } finally {
-          setIsLoading(false);
-        }
-      }, 300);
+    // Get search suggestions
+    if (value.length >= 2) {
+      const results = await getSuggestions(value);
+      setSuggestions(results);
+      setShowSuggestions(true);
     } else {
+      setShowSuggestions(false);
       setSuggestions([]);
     }
+
+    // Set a new debounce timer for product search
+    timeoutRef.current = setTimeout(async () => {
+      try {
+        // Keep the original search functionality
+        await fetch(`/api/products?q=${encodeURIComponent(value)}`);
+      } catch (err) {
+        console.error('Search error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 400);
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-
+  const handleSuggestionClick = async (suggestion: any) => {
+    setQuery(suggestion.name || suggestion.searchTerm);
+    setShowSuggestions(false);
     setIsLoading(true);
+
     try {
-      const { products } = await searchAPI.searchProducts({ q: query });
-      setProducts(products);
-      setSuggestions([]);
-    } catch (error) {
-      console.error('Search error:', error);
+      let searchUrl = `/products?q=${encodeURIComponent(suggestion.name || suggestion.searchTerm)}`;
+      if (suggestion.type === 'category') {
+        searchUrl = `/products?category=${encodeURIComponent(suggestion.searchTerm)}`;
+      }
+
+      // Navigate to search results page
+      window.location.href = searchUrl;
+    } catch (err) {
+      console.error('Search error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -58,49 +79,59 @@ export function SearchBar() {
 
   const clearSearch = () => {
     setQuery('');
+    setShowSuggestions(false);
     setSuggestions([]);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
   };
 
   return (
-    <div className="relative">
-      <form onSubmit={handleSearch} className="relative">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => handleInputChange(e.target.value)}
-            placeholder="Search for shoes, clothes, bags..."
-            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5156D2] focus:border-transparent"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      </form>
+    <div ref={searchRef} className="relative w-full max-w-md">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <input
+          value={query}
+          onChange={(e) => handleInputChange(e.target.value)}
+          className="w-full px-10 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-[#5156D2] focus:border-transparent"
+          placeholder="Search products..."
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+        {isLoading && (
+          <Loader2 className="absolute right-8 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+        )}
+      </div>
 
-      {/* Search Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
+      {/* Suggestions Dropdown */}
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
+          <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
+            Search suggestions
+          </div>
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
-              onClick={() => {
-                setQuery(suggestion);
-                handleSearch(new Event('submit') as any);
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 border-b border-gray-100 last:border-b-0"
+              type="button"
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center space-x-3"
             >
-              {suggestion}
+              {suggestion.type === 'product' && suggestion.image && (
+                <img src={suggestion.image} alt="" className="w-8 h-8 object-cover rounded" />
+              )}
+              <div className="flex-1">
+                <div className="font-medium text-sm">{suggestion.name}</div>
+                {suggestion.type === 'product' && (
+                  <div className="text-xs text-gray-500">${suggestion.price} • {suggestion.category}</div>
+                )}
+                {suggestion.type === 'category' && (
+                  <div className="text-xs text-gray-500">Category</div>
+                )}
+              </div>
             </button>
           ))}
         </div>

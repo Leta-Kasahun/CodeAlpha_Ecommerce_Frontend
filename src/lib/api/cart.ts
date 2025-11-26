@@ -1,85 +1,60 @@
-// src/lib/api/auth.ts
-import { apiConfig } from './config';
-import { User } from '@/src/types';
+// Cart API compatible with your backend structure
+// Path: src/lib/api/cart.ts
 
-interface LoginData {
-  email: string;
-  password: string;
+import { apiConfig } from './config'
+
+interface CartItem {
+  product: any
+  qty: number
 }
 
-interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string; // Add this
+interface Cart {
+  user: string
+  items: CartItem[]
+  total: number
 }
 
-interface VerifyOTPData {
-  email: string;
-  otp: string;
+interface CartResponse {
+  success: boolean
+  cart: Cart
+  message?: string
 }
 
-interface ForgotPasswordData {
-  email: string;
+export const cartAPI = {
+  // Get user cart
+  getCart: async (): Promise<CartResponse> => {
+    return apiConfig.authRequest('/api/cart', '', {
+      method: 'GET',
+    })
+  },
+
+  // Add item to cart
+  addToCart: async (productId: string, quantity: number = 1): Promise<CartResponse> => {
+    return apiConfig.authRequest('/api/cart/add', '', {
+      method: 'POST',
+      body: JSON.stringify({ productId, quantity }),
+    })
+  },
+
+  // Update cart item quantity
+  updateCartItem: async (productId: string, quantity: number): Promise<CartResponse> => {
+    return apiConfig.authRequest(`/api/cart/update/${productId}`, '', {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
+    })
+  },
+
+  // Remove item from cart
+  removeFromCart: async (productId: string): Promise<CartResponse> => {
+    return apiConfig.authRequest(`/api/cart/remove/${productId}`, '', {
+      method: 'DELETE',
+    })
+  },
+
+  // Clear cart
+  clearCart: async (): Promise<CartResponse> => {
+    return apiConfig.authRequest('/api/cart/clear', '', {
+      method: 'DELETE',
+    })
+  },
 }
-
-interface VerifyResetOTPData {
-  email: string;
-  otp: string;
-}
-
-interface ResetPasswordData {
-  email: string;
-  otp: string;
-  newPassword: string;
-}
-
-export const authAPI = {
-  login: async (data: LoginData): Promise<{ user: User; token: string }> => {
-    return apiConfig.request('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  register: async (data: RegisterData): Promise<{ message: string }> => {
-    return apiConfig.request('/api/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  verifyOTP: async (data: VerifyOTPData): Promise<{ user: User; token: string }> => {
-    return apiConfig.request('/api/auth/verify-otp', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  logout: async (token: string): Promise<{ message: string }> => {
-    return apiConfig.authRequest('/api/auth/logout', token, {
-      method: 'POST',
-    });
-  },
-
-  forgotPassword: async (data: ForgotPasswordData): Promise<{ message: string }> => {
-    return apiConfig.request('/api/auth/forgot-password', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  verifyResetOTP: async (data: VerifyResetOTPData): Promise<{ message: string }> => {
-    return apiConfig.request('/api/auth/verify-reset-otp', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  resetPassword: async (data: ResetPasswordData): Promise<{ message: string }> => {
-    return apiConfig.request('/api/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-};

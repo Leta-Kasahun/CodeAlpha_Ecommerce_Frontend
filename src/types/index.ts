@@ -10,6 +10,7 @@ export interface User {
     postalCode: string
     country: string
   }
+  avatar?: string | null,
   isVerified: boolean
   createdAt: string
   updatedAt: string

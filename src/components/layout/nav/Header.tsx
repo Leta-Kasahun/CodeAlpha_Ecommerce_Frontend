@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Navigation } from './Navigation';
-import { SearchBar } from './SearchBar';
+import SearchBar from './SearchBar';
 import { UserActions } from './UserActions';
 import { MobileMenu } from './mobileMenu';
 import { Logo } from './Logo';
