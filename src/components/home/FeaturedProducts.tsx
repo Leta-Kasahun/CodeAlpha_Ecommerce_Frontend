@@ -1,26 +1,22 @@
-// Featured products component for home page - all products
+// Featured products with working cart functionality
 // Path: src/components/home/FeaturedProducts.tsx
 
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ShoppingCart } from 'lucide-react'
 import { productsAPI } from '@/src/lib/api/products'
-import { useCartStore } from '@/src/stores'
-import { Product } from '@/src/types' 
+import { AddToCartButton } from '@/src/components/cart/AddToCartButton'
 
 export function FeaturedProducts() {
-const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const { addItem } = useCartStore()
 
   useEffect(() => {
     const loadFeaturedProducts = async () => {
       try {
         const response = await productsAPI.getProducts()
-        // Get all products from response
         const allProducts = response.products || response || []
         setProducts(allProducts.slice(0, 8))
       } catch (error) {
@@ -33,10 +29,6 @@ const [products, setProducts] = useState<Product[]>([])
 
     loadFeaturedProducts()
   }, [])
-
-  const handleAddToCart = (product:Product) => {
-    addItem(product, 1)
-  }
 
   if (loading) {
     return (
@@ -60,7 +52,7 @@ const [products, setProducts] = useState<Product[]>([])
 
         {products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {products.map((product) => (
+            {products.map((product: any) => (
               <div
                 key={product._id}
                 className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
@@ -91,12 +83,13 @@ const [products, setProducts] = useState<Product[]>([])
                     <span className="text-lg md:text-xl font-bold text-[#5156D2]">
                       ${product.price}
                     </span>
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="bg-[#5156D2] text-white p-2 rounded-lg hover:bg-[#4549C7] transition-colors"
-                    >
-                      <ShoppingCart className="h-4 w-4" />
-                    </button>
+                    <AddToCartButton
+                      productId={product._id}
+                      productName={product.name}
+                      disabled={!product.isAvailable || product.quantity === 0}
+                      size="sm"
+                      showText={false}
+                    />
                   </div>
                 </div>
               </div>

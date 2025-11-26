@@ -34,7 +34,7 @@ export function VerifyOTPForm({ email }: { email: string }) {
     });
     
     if (result.success) {
-      router.push('/');
+      router.push('/dashboard');
     }
   };
 

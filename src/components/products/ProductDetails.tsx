@@ -1,13 +1,12 @@
-// Product details component
+// Product details component with small buttons
 // Path: src/components/products/ProductDetails.tsx
 
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ShoppingCart, Package, Star, Truck, Shield } from 'lucide-react'
+import { ArrowLeft, Package, Truck, Shield, Star, Eye } from 'lucide-react'
 import { productsAPI } from '@/src/lib/api/products'
-import { useCart } from '@/src/hooks/useCart'
 import { AddToCartButton } from '@/src/components/cart/AddToCartButton'
 import { Button } from '@/src/components/ui/button'
 
@@ -22,17 +21,14 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const router = useRouter()
-  const { addToCart } = useCart()
-useEffect(() => {
-  if (!productId) {
-    setError('Product ID is missing')
-    setLoading(false)
-    return
-  }
-  
-  loadProduct()
-}, [productId])
+
   useEffect(() => {
+    if (!productId) {
+      setError('Product ID is missing')
+      setLoading(false)
+      return
+    }
+    
     loadProduct()
   }, [productId])
 
@@ -52,17 +48,6 @@ useEffect(() => {
       setError('Failed to load product')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleAddToCart = async () => {
-    if (!product) return
-    
-    try {
-      await addToCart(product._id, quantity)
-      // Success feedback can be added here
-    } catch (error) {
-      // Error handled by hook
     }
   }
 
@@ -230,16 +215,25 @@ useEffect(() => {
               </div>
             )}
 
-            {/* Add to Cart Button */}
-            <div className="flex space-x-4">
-              <AddToCartButton
-                productId={product._id}
-                productName={product.name}
-                disabled={isOutOfStock}
-                size="lg"
-                className="flex-1"
-              />
-            </div>
+            {/* Add to Cart Buttons */}
+            {!isOutOfStock && (
+              <div className="flex space-x-3">
+                <AddToCartButton
+                  productId={product._id}
+                  productName={product.name}
+                  disabled={isOutOfStock}
+                  size="sm"
+                  showText={true}
+                />
+                <Button
+                  onClick={() => router.push('/cart')}
+                  className="bg-[#E6B84A] hover:bg-[#d4a63f] text-white flex items-center space-x-2 px-3 py-2 text-sm"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span>View Cart</span>
+                </Button>
+              </div>
+            )}
 
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200">

@@ -1,4 +1,4 @@
-// Reusable cart hook for all components
+// Fixed cart hook with stable dependencies
 // Path: src/hooks/useCart.ts
 
 'use client'
@@ -7,98 +7,128 @@ import { useState, useCallback } from 'react'
 import { cartAPI } from '@/src/lib/api/cart'
 import { useAuthStore } from '@/src/stores'
 
-interface UseCartReturn {
-  cart: any
-  loading: boolean
-  error: string
-  addToCart: (productId: string, quantity?: number) => Promise<void>
-  updateCartItem: (productId: string, quantity: number) => Promise<void>
-  removeFromCart: (productId: string) => Promise<void>
-  clearCart: () => Promise<void>
-  loadCart: () => Promise<void>
-  clearError: () => void
-}
-
-export function useCart(): UseCartReturn {
+export function useCart() {
   const [cart, setCart] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { token, user } = useAuthStore()
+  const { token, isAuthenticated } = useAuthStore()
 
+  // Stable loadCart function
   const loadCart = useCallback(async () => {
-    if (!token || !user) return
+    if (!isAuthenticated || !token) {
+      console.log('🛒 Not authenticated, cannot load cart')
+      setCart(null)
+      return
+    }
     
     try {
       setLoading(true)
-      const response = await cartAPI.getCart()
-      setCart(response.cart)
+      setError('')
+      console.log('🛒 Loading cart with token...')
+      const response = await cartAPI.getCart(token)
+      console.log('🛒 Cart API response:', response)
+      
+      if (response.success) {
+        setCart(response.cart)
+        console.log('🛒 Cart loaded successfully:', response.cart)
+      } else {
+        setError(response.message || 'Failed to load cart')
+        setCart(null)
+      }
     } catch (err) {
-      setError('Failed to load cart')
+      console.error('🛒 Cart load error:', err)
+      setError('Failed to load cart from server')
+      setCart(null)
     } finally {
       setLoading(false)
     }
-  }, [token, user])
+  }, [isAuthenticated, token]) // Stable dependencies
 
   const addToCart = useCallback(async (productId: string, quantity: number = 1) => {
-    if (!token) {
+    if (!isAuthenticated || !token) {
       setError('Please log in to add to cart')
       return
     }
 
     try {
       setLoading(true)
-      const response = await cartAPI.addToCart(productId, quantity)
-      setCart(response.cart)
+      setError('')
+      console.log('🛒 Adding to cart:', { productId, quantity })
+      
+      const response = await cartAPI.addToCart(productId, quantity, token)
+      console.log('🛒 Add to cart response:', response)
+      
+      if (response.success) {
+        await loadCart()
+      } else {
+        setError(response.message || 'Failed to add to cart')
+      }
     } catch (err) {
-      setError('Failed to add to cart')
+      console.error('🛒 Add to cart error:', err)
+      setError('Failed to add item to cart')
     } finally {
       setLoading(false)
     }
-  }, [token])
+  }, [isAuthenticated, token, loadCart])
 
   const updateCartItem = useCallback(async (productId: string, quantity: number) => {
-    if (!token) return
+    if (!isAuthenticated || !token) return
 
     try {
       setLoading(true)
-      const response = await cartAPI.updateCartItem(productId, quantity)
-      setCart(response.cart)
+      const response = await cartAPI.updateCartItem(productId, quantity, token)
+      if (response.success) {
+        await loadCart()
+      } else {
+        setError(response.message || 'Failed to update cart')
+      }
     } catch (err) {
-      setError('Failed to update cart')
+      console.error('🛒 Update cart error:', err)
+      setError('Failed to update cart item')
     } finally {
       setLoading(false)
     }
-  }, [token])
+  }, [isAuthenticated, token, loadCart])
 
   const removeFromCart = useCallback(async (productId: string) => {
-    if (!token) return
+    if (!isAuthenticated || !token) return
 
     try {
       setLoading(true)
-      const response = await cartAPI.removeFromCart(productId)
-      setCart(response.cart)
+      const response = await cartAPI.removeFromCart(productId, token)
+      if (response.success) {
+        await loadCart()
+      } else {
+        setError(response.message || 'Failed to remove from cart')
+      }
     } catch (err) {
-      setError('Failed to remove from cart')
+      console.error('🛒 Remove from cart error:', err)
+      setError('Failed to remove item from cart')
     } finally {
       setLoading(false)
     }
-  }, [token])
+  }, [isAuthenticated, token, loadCart])
 
   const clearCart = useCallback(async () => {
-    if (!token) return
+    if (!isAuthenticated || !token) return
 
     try {
       setLoading(true)
-      const response = await cartAPI.clearCart()
-      setCart(response.cart)
+      const response = await cartAPI.clearCart(token)
+      if (response.success) {
+        await loadCart()
+      } else {
+        setError(response.message || 'Failed to clear cart')
+      }
     } catch (err) {
+      console.error('🛒 Clear cart error:', err)
       setError('Failed to clear cart')
     } finally {
       setLoading(false)
     }
-  }, [token])
+  }, [isAuthenticated, token, loadCart])
 
-  const clearError = () => setError('')
+  const clearError = useCallback(() => setError(''), [])
 
   return {
     cart,
