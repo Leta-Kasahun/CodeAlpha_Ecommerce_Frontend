@@ -3,7 +3,18 @@
 A complete full-stack e-commerce solution built with modern technologies for the **CodeAlpha Full Stack Development Internship**.
 
 ---
+---
 
+## 🎥 Project Demo Video
+
+Watch a full walkthrough of the CodeAlpha E-Commerce Platform:
+
+[▶️ Watch the Demo on YouTube](https://youtu.be/HkTxJcv86y4)
+
+<video src="https://youtu.be/HkTxJcv86y4" controls width="700">
+</video>
+
+---
 ## 📋 Table of Contents
 
 - [Project Overview](#project-overview)  
