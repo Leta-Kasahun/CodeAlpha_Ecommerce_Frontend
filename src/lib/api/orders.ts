@@ -1,4 +1,6 @@
- 
+// Fixed orders API matching backend response structure
+// Path: src/lib/api/orders.ts
+
 import { apiConfig } from './config';
 import { Order } from '@/src/types';
 
@@ -8,37 +10,55 @@ interface CreateOrderData {
     postalCode: string;
     country: string;
   };
-  paymentMethod: 'card' | 'upi' | 'wallet' | 'cash';
+  paymentMethod: string;
 }
 
-interface UpdateOrderStatusData {
-  status: 'processing' | 'shipped' | 'completed';
+interface OrdersResponse {
+  success: boolean;
+  count: number;
+  orders: Order[];
+}
+
+interface OrderResponse {
+  success: boolean;
+  order: Order;
+}
+
+interface OrderHistoryResponse {
+  success: boolean;
+  message: string;
+  orders: Order[];
+  total?: number;
+  page?: number;
+  pages?: number;
 }
 
 export const ordersAPI = {
-  createOrder: async (data: CreateOrderData, token: string): Promise<Order> => {
+  createOrder: async (data: CreateOrderData, token: string): Promise<OrderResponse> => {
     return apiConfig.authRequest('/api/orders', token, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
-  getOrders: async (token: string): Promise<Order[]> => {
+  getOrders: async (token: string): Promise<OrdersResponse> => {
     return apiConfig.authRequest('/api/orders', token);
   },
 
-  getOrder: async (id: string, token: string): Promise<Order> => {
+  getOrder: async (id: string, token: string): Promise<OrderResponse> => {
     return apiConfig.authRequest(`/api/orders/${id}`, token);
   },
 
-  updateOrderStatus: async (id: string, data: UpdateOrderStatusData, token: string): Promise<Order> => {
+  updateOrderStatus: async (id: string, status: string, token: string): Promise<OrderResponse> => {
     return apiConfig.authRequest(`/api/orders/${id}/status`, token, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ status }),
     });
   },
 
-  getOrderHistory: async (token: string): Promise<Order[]> => {
-    return apiConfig.authRequest('/api/order-history', token);
+  getOrderHistory: async (token: string, params?: any): Promise<OrderHistoryResponse> => {
+    const queryParams = new URLSearchParams(params).toString();
+    const url = `/api/order-history${queryParams ? `?${queryParams}` : ''}`;
+    return apiConfig.authRequest(url, token);
   },
 };

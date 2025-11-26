@@ -1,5 +1,4 @@
 // src/app/dashboard/page.tsx
-// Main dashboard with seller button
 
 import { DashboardStats } from '@/src/components/dashboard/DashboardStats'
 import { FashionRecommendations } from '@/src/components/dashboard/FashionRecommendations'

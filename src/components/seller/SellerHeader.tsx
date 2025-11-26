@@ -1,21 +1,27 @@
 // src/components/seller/SellerHeader.tsx
-// Seller header with navigation
-
 'use client'
 
-import { useAuthStore } from '@/src/stores'
-import { Menu, Bell, User } from 'lucide-react'
+import { useState } from 'react'
+import { Menu } from 'lucide-react'
+import { SearchBar } from '../navigation/SearchBar'
+import { NotificationsBell } from '../navigation/NotificationBell'
+import { UserAvatar } from '../navigation/UserAvatar'
+import { CategoryFilter } from '../navigation/CategoryFilter'
 
 interface SellerHeaderProps {
   onToggleSidebar: () => void
 }
 
 export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
-  const { user } = useAuthStore()
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+  }
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200">
+      <div className="flex items-center justify-between w-full px-6 py-4">
         <div className="flex items-center space-x-4">
           <button
             onClick={onToggleSidebar}
@@ -23,25 +29,18 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="hidden md:block">
-            <h2 className="text-lg font-semibold text-gray-900">Seller Center</h2>
-          </div>
+          
+          <CategoryFilter 
+            onCategoryChange={handleCategoryChange}
+            selectedCategory={selectedCategory}
+          />
+
+          <SearchBar placeholder="Search products or orders..." className="hidden lg:block" />
         </div>
         
         <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-400 hover:text-gray-600">
-            <Bell className="h-5 w-5" />
-          </button>
-          
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-[#5156D2] rounded-full flex items-center justify-center">
-              <User className="h-4 w-4 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-              <p className="text-xs text-gray-500">Seller</p>
-            </div>
-          </div>
+          <NotificationsBell count={5} />
+          <UserAvatar showName={true} />
         </div>
       </div>
     </header>

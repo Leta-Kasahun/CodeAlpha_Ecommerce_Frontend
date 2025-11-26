@@ -1,17 +1,30 @@
-// Cart API with proper authentication
-// Path: src/lib/api/cart.ts
+// src/lib/api/cart.ts
+// Fixed cart API with frontend total calculation and proper TypeScript types
 
 import { apiConfig } from './config'
 
+interface Product {
+  _id: string
+  name: string
+  price: number
+  images: string[]
+  description?: string
+  category?: string
+  isAvailable?: boolean
+}
+
 interface CartItem {
-  product: any
+  product: Product
   qty: number
 }
 
 interface Cart {
+  _id: string
   user: string
   items: CartItem[]
   total: number
+  createdAt: string
+  updatedAt: string
 }
 
 interface CartResponse {
@@ -20,41 +33,84 @@ interface CartResponse {
   message?: string
 }
 
+
+const calculateCartTotal = (cart: Cart): number => {
+  if (!cart.items) return 0;
+  return cart.items.reduce((total, item) => {
+    if (!item.product || !item.product.price) return total;
+    return total + (item.product.price * item.qty);
+  }, 0);
+};
+
 export const cartAPI = {
-  // Get user cart
+
   getCart: async (token: string): Promise<CartResponse> => {
-    return apiConfig.authRequest('/api/cart', token, {
+    const response = await apiConfig.authRequest<CartResponse>('/api/cart', token, {
       method: 'GET',
-    })
+    });
+    
+
+    if (response.success && response.cart) {
+      response.cart.total = calculateCartTotal(response.cart);
+    }
+    
+    return response;
   },
 
-  // Add item to cart
+ 
   addToCart: async (productId: string, quantity: number = 1, token: string): Promise<CartResponse> => {
-    return apiConfig.authRequest('/api/cart/add', token, {
+    const response = await apiConfig.authRequest<CartResponse>('/api/cart/add', token, {
       method: 'POST',
       body: JSON.stringify({ productId, quantity }),
-    })
+    });
+    
+
+    if (response.success && response.cart) {
+      response.cart.total = calculateCartTotal(response.cart);
+    }
+    
+    return response;
   },
 
-  // Update cart item quantity
+ 
   updateCartItem: async (productId: string, quantity: number, token: string): Promise<CartResponse> => {
-    return apiConfig.authRequest(`/api/cart/update/${productId}`, token, {
+    const response = await apiConfig.authRequest<CartResponse>(`/api/cart/update/${productId}`, token, {
       method: 'PUT',
       body: JSON.stringify({ quantity }),
-    })
+    });
+    
+
+    if (response.success && response.cart) {
+      response.cart.total = calculateCartTotal(response.cart);
+    }
+    
+    return response;
   },
 
-  // Remove item from cart
+
   removeFromCart: async (productId: string, token: string): Promise<CartResponse> => {
-    return apiConfig.authRequest(`/api/cart/remove/${productId}`, token, {
+    const response = await apiConfig.authRequest<CartResponse>(`/api/cart/remove/${productId}`, token, {
       method: 'DELETE',
-    })
+    });
+
+    if (response.success && response.cart) {
+      response.cart.total = calculateCartTotal(response.cart);
+    }
+    
+    return response;
   },
 
-  // Clear cart
+  
   clearCart: async (token: string): Promise<CartResponse> => {
-    return apiConfig.authRequest('/api/cart/clear', token, {
+    const response = await apiConfig.authRequest<CartResponse>('/api/cart/clear', token, {
       method: 'DELETE',
-    })
+    });
+    
+ 
+    if (response.success && response.cart) {
+      response.cart.total = 0;
+    }
+    
+    return response;
   },
 }

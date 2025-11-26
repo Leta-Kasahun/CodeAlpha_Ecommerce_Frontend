@@ -1,42 +1,33 @@
-// Cart summary component with flexible data handling
-// Path: src/components/cart/CartSummary.tsx
+// src/components/cart/CartSummary.tsx
+'use client';
 
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { useCart } from '@/src/hooks/useCart'
-import { Button } from '@/src/components/ui/button'
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/src/hooks/useCart';
+import { Truck, Shield, ArrowRight } from 'lucide-react';
 
 export function CartSummary() {
-  const { cart } = useCart()
-  const router = useRouter()
+  const { cart } = useCart();
+  const router = useRouter();
 
-  console.log('🛒 Cart data in CartSummary:', cart)
-
-  if (!cart) return null
-
-  // Handle different cart data structures
-  const cartItems = cart.items || cart.cart?.items || []
-  
-  const subtotal = cartItems.reduce((total: number, item: any) => {
-    const product = item.product || item
-    const quantity = item.qty || item.quantity || 1
-    return total + (product.price * quantity)
-  }, 0)
-
-  const shipping = subtotal > 50 ? 0 : 9.99
-  const tax = subtotal * 0.1 // 10% tax
-  const total = subtotal + shipping + tax
-
-  const handleCheckout = () => {
-    router.push('/checkout')
+  // Null safety check
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return null;
   }
 
+  const subtotal = cart.total;
+  const shipping = subtotal > 50 ? 0 : 9.99;
+  const tax = subtotal * 0.1;
+  const total = subtotal + shipping + tax;
+
+  const handleCheckout = () => {
+    router.push('/dashboard/checkout');
+  };
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-4">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
       
-      <div className="space-y-3">
+      <div className="space-y-3 mb-6">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Subtotal</span>
           <span className="font-medium">${subtotal.toFixed(2)}</span>
@@ -56,24 +47,37 @@ export function CartSummary() {
         
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between text-base font-semibold">
-            <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span className="text-gray-900">Total</span>
+            <span className="text-[#5156D2]">${total.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
-      <Button
+      <button
         onClick={handleCheckout}
-        className="w-full mt-6 bg-[#5156D2] hover:bg-[#4549C7] text-white py-3 text-lg"
+        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors font-medium"
       >
         Proceed to Checkout
-      </Button>
+        <ArrowRight className="w-4 h-4" />
+      </button>
+
+      {/* Trust Badges */}
+      <div className="space-y-3 pt-6 border-t border-gray-200 mt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Truck className="w-4 h-4 text-[#E6B84A]" />
+          <span>Free shipping over $50</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Shield className="w-4 h-4 text-[#E6B84A]" />
+          <span>Secure checkout</span>
+        </div>
+      </div>
 
       {subtotal < 50 && (
-        <p className="text-sm text-center text-gray-600 mt-3">
+        <p className="text-sm text-center text-[#E6B84A] mt-4 font-medium">
           Add ${(50 - subtotal).toFixed(2)} more for free shipping!
         </p>
       )}
     </div>
-  )
+  );
 }
