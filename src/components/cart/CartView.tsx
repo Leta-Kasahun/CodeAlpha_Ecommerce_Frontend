@@ -1,4 +1,4 @@
-// src/components/cart/CartView.tsx (HANDLES EMPTY STATE INTERNALLY)
+// src/components/cart/CartView.tsx
 'use client';
 
 import { useEffect } from 'react';
@@ -10,17 +10,14 @@ import { Loader2, AlertCircle, ShoppingCart, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function CartView() {
-  const { cart, loading, error, loadCart } = useCart();
+  const { cart, loading, error, loadCart, updateCartItem, removeFromCart } = useCart();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadCart();
-    }
+    if (isAuthenticated) loadCart();
   }, [isAuthenticated, loadCart]);
 
-  // Loading State
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -34,7 +31,6 @@ export function CartView() {
     );
   }
 
-  // Error State
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -55,7 +51,6 @@ export function CartView() {
     );
   }
 
-  // Empty State (NOW HANDLED IN CARTVIEW - NO SEPARATE COMPONENT)
   if (!cart?.items?.length) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -78,7 +73,6 @@ export function CartView() {
     );
   }
 
-  // Main Cart View
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,10 +86,15 @@ export function CartView() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <CartItems />
+            <CartItems
+              cart={cart}
+              updateCartItem={updateCartItem}
+              removeFromCart={removeFromCart}
+              loading={loading}
+            />
           </div>
           <div className="lg:col-span-1">
-            <CartSummary />
+            <CartSummary cart={cart} />
           </div>
         </div>
       </div>

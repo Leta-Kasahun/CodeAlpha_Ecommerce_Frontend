@@ -6,64 +6,63 @@ import { useCreateOrder } from '@/src/hooks/useCreateOrder';
 import { ShippingAddressForm } from './ShippingAddressForm';
 import { PaymentMethodSelect } from './PaymentMethodSelect';
 import { OrderSummary } from './OrderSummary';
+import { useAuthStore } from '@/src/stores';
 
 export const CheckoutForm = () => {
+  const { isAuthenticated } = useAuthStore();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    shippingAddress: {
-      city: '',
-      postalCode: '',
-      country: '',
-    },
+    shippingAddress: { city: '', postalCode: '', country: '' },
     paymentMethod: 'card',
   });
 
   const { createOrder, loading, error } = useCreateOrder();
 
+  const updateFormData = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) return;
     await createOrder(formData);
   };
 
-  const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Sign in to checkout</h2>
+          <p className="text-sm text-gray-600 mb-6">Please sign in to complete your order.</p>
+          <div className="flex justify-center gap-3">
+            <a href="/login" className="px-4 py-2 bg-[#5156D2] text-white rounded-lg">Login</a>
+            <a href="/register" className="px-4 py-2 border border-gray-300 rounded-lg">Register</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Main Form */}
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
       <div className="lg:col-span-2 space-y-6">
         {/* Progress Steps */}
         <div className="flex items-center justify-between max-w-md">
           {['Shipping', 'Payment', 'Review'].map((stepName, index) => (
             <div key={stepName} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step > index + 1 
-                  ? 'bg-[#5156D2] text-white'
-                  : step === index + 1
-                  ? 'bg-[#E6B84A] text-white'
-                  : 'bg-gray-200 text-gray-600'
+                step > index + 1 ? 'bg-[#5156D2] text-white' : step === index + 1 ? 'bg-[#E6B84A] text-white' : 'bg-gray-200 text-gray-600'
               }`}>
                 {step > index + 1 ? '✓' : index + 1}
               </div>
-              <span className={`ml-2 text-sm ${
-                step >= index + 1 ? 'text-gray-900 font-medium' : 'text-gray-500'
-              }`}>
+              <span className={`ml-2 text-sm ${step >= index + 1 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
                 {stepName}
               </span>
-              {index < 2 && (
-                <div className={`w-12 h-0.5 mx-4 ${
-                  step > index + 1 ? 'bg-[#5156D2]' : 'bg-gray-200'
-                }`} />
-              )}
+              {index < 2 && <div className={`w-12 h-0.5 mx-4 ${step > index + 1 ? 'bg-[#5156D2]' : 'bg-gray-200'}`} />}
             </div>
           ))}
         </div>
 
-        {/* Form Steps */}
         {step === 1 && (
           <ShippingAddressForm
             data={formData.shippingAddress}
@@ -82,7 +81,7 @@ export const CheckoutForm = () => {
         )}
 
         {step === 3 && (
-          <div className="space-y-4">
+          <div className="space-y-4 h-full flex flex-col">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center">
                 <div className="bg-green-100 p-2 rounded-full">
@@ -116,7 +115,7 @@ export const CheckoutForm = () => {
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 mt-auto">
               <button
                 type="button"
                 onClick={() => setStep(2)}
@@ -136,9 +135,11 @@ export const CheckoutForm = () => {
         )}
       </div>
 
-      {/* Order Summary Sidebar */}
+      {/* Order Summary Sidebar (stretches to match left column) */}
       <div className="lg:col-span-1">
-        <OrderSummary />
+        <div className="h-full flex flex-col">
+          <OrderSummary />
+        </div>
       </div>
     </form>
   );

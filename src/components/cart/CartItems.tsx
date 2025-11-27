@@ -1,14 +1,17 @@
-// src/components/cart/CartItems.tsx - FIXED
+// src/components/cart/CartItems.tsx
 'use client';
 
 import { Minus, Plus, Trash2, Package } from 'lucide-react';
-import { useCart } from '@/src/hooks/useCart';
 
-export function CartItems() {
-  const { cart, updateCartItem, removeFromCart, loading } = useCart();
+type Props = {
+  cart: any;
+  updateCartItem: (productId: string, quantity: number) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
+  loading: boolean;
+};
 
-  // Null safety check
-  if (!cart || !cart.items) {
+export function CartItems({ cart, updateCartItem, removeFromCart, loading }: Props) {
+  if (!cart || !Array.isArray(cart.items) || cart.items.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
         <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -35,14 +38,17 @@ export function CartItems() {
       </div>
       
       <div className="divide-y divide-gray-200">
-        {cart.items.map((item) => {
-          const product = item.product;
-          const quantity = item.qty;
-          const productId = product._id;
+        {cart.items.map((item: any) => {
+          const rawProduct = item.product;
+          const product = typeof rawProduct === 'string'
+            ? { _id: rawProduct, name: 'Product removed', price: 0, images: [] }
+            : (rawProduct ?? { _id: item._id ?? '', name: 'Product removed', price: 0, images: [] });
+
+          const quantity = Number(item.qty || 0);
+          const productId = product._id || item._id || '';
 
           return (
-            <div key={productId} className="p-4 sm:p-6 flex items-center gap-4">
-              {/* Product Image */}
+            <div key={item._id ?? productId} className="p-4 sm:p-6 flex items-center gap-4">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 {product.images?.[0] ? (
                   <img
@@ -55,7 +61,6 @@ export function CartItems() {
                 )}
               </div>
 
-              {/* Product Details */}
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-gray-900 truncate text-sm sm:text-base">
                   {product.name}
@@ -64,7 +69,6 @@ export function CartItems() {
                   ${product.price}
                 </p>
                 
-                {/* Quantity Controls */}
                 <div className="flex items-center gap-3 mt-2">
                   <div className="flex items-center border border-gray-300 rounded-lg">
                     <button
@@ -86,7 +90,6 @@ export function CartItems() {
                     </button>
                   </div>
 
-                  {/* Remove Button */}
                   <button
                     onClick={() => handleRemoveItem(productId)}
                     disabled={loading}
@@ -97,10 +100,9 @@ export function CartItems() {
                 </div>
               </div>
 
-              {/* Item Total */}
               <div className="text-right flex-shrink-0">
                 <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                  ${(product.price * quantity).toFixed(2)}
+                  ${(Number(product.price || 0) * quantity).toFixed(2)}
                 </p>
               </div>
             </div>

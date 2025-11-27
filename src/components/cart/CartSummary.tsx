@@ -1,30 +1,32 @@
 // src/components/cart/CartSummary.tsx
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import { useCart } from '@/src/hooks/useCart';
-import { Truck, Shield, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation'
+import { Truck, Shield, ArrowRight } from 'lucide-react'
 
-export function CartSummary() {
-  const { cart } = useCart();
-  const router = useRouter();
+type Props = { cart: any }
 
-  // Null safety check
-  if (!cart || !cart.items || cart.items.length === 0) {
-    return null;
+export function CartSummary({ cart }: Props) {
+  const router = useRouter()
+
+  if (!cart || !Array.isArray(cart.items) || cart.items.length === 0) {
+    return null
   }
 
-  const subtotal = cart.total;
-  const shipping = subtotal > 50 ? 0 : 9.99;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
+  const subtotal = typeof cart.total === 'number'
+    ? cart.total
+    : cart.items.reduce((s: number, it: any) => s + (Number(it.qty || 0) * Number((it.product && it.product.price) || 0)), 0)
+
+  const shipping = subtotal > 50 ? 0 : 9.99
+  const tax = subtotal * 0.1
+  const total = subtotal + shipping + tax
 
   const handleCheckout = () => {
-    router.push('/dashboard/checkout');
-  };
+    router.push('/dashboard/checkout')
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-4">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
       
       <div className="space-y-3 mb-6">
@@ -61,7 +63,6 @@ export function CartSummary() {
         <ArrowRight className="w-4 h-4" />
       </button>
 
-      {/* Trust Badges */}
       <div className="space-y-3 pt-6 border-t border-gray-200 mt-6">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Truck className="w-4 h-4 text-[#E6B84A]" />
@@ -79,5 +80,5 @@ export function CartSummary() {
         </p>
       )}
     </div>
-  );
+  )
 }

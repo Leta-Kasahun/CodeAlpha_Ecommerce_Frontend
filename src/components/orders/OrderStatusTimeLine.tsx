@@ -47,7 +47,6 @@ export const OrderStatusTimeline = ({ order, onStatusUpdate }: OrderStatusTimeli
 
           return (
             <div key={step.key} className="flex items-start gap-3">
-              {/* Status Indicator */}
               <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center ${
                 isCompleted
                   ? 'bg-[#5156D2] border-[#5156D2]'
@@ -64,16 +63,12 @@ export const OrderStatusTimeline = ({ order, onStatusUpdate }: OrderStatusTimeli
                 )}
               </div>
 
-              {/* Status Content */}
               <div className="flex-1 min-w-0">
-                <p className={`font-medium ${
-                  isCompleted || isCurrent ? 'text-gray-900' : 'text-gray-500'
-                }`}>
+                <p className={`font-medium ${isCompleted || isCurrent ? 'text-gray-900' : 'text-gray-500'}`}>
                   {step.label}
                 </p>
                 <p className="text-sm text-gray-600 truncate">{step.description}</p>
                 
-                {/* Show current status badge */}
                 {isCurrent && (
                   <span className="inline-block mt-1 px-2 py-1 text-xs bg-[#E6B84A] text-white rounded-full">
                     Current Status
