@@ -1,4 +1,4 @@
-// src/hooks/useOrders.ts
+// useOrders: fetch and manage orders. Handles backend envelope and protects against undefined payloads.
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -51,8 +51,10 @@ export const useOrders = (): UseOrdersReturn => {
 
       const response = await ordersAPI.getOrders(token);
       
-      if (response.success) {
-        setOrders(response.orders);
+      if (response && response.success) {
+        setOrders(response.orders ?? []);
+      } else {
+        setOrders([]);
       }
     } catch (err: any) {
       if (err.message?.includes('Invalid token') || err.message?.includes('Authentication')) {
@@ -75,10 +77,16 @@ export const useOrders = (): UseOrdersReturn => {
 
       const response = await ordersAPI.updateOrderStatus(orderId, newStatus, token);
       
-      if (response.success) {
-        setOrders(prev => prev.map(order => 
-          order._id === orderId ? { ...order, orderStatus: newStatus } : order
-        ));
+      if (response && response.success) {
+        // If backend returns updated order object, use it. Otherwise do a safe local update.
+        if ((response as any).order) {
+          const updatedOrder = (response as any).order as Order;
+          setOrders(prev => prev.map(o => (o._id === orderId ? updatedOrder : o)));
+        } else {
+          setOrders(prev => prev.map(order => 
+            order._id === orderId ? { ...order, orderStatus: newStatus } : order
+          ));
+        }
       }
     } catch (err: any) {
       if (err.message?.includes('Invalid token') || err.message?.includes('Authentication')) {
@@ -95,7 +103,6 @@ export const useOrders = (): UseOrdersReturn => {
   };
 
   useEffect(() => {
-    // Check auth state before fetching
     if (isAuthenticated && token) {
       fetchOrders();
     } else {

@@ -1,15 +1,13 @@
-// src/components/checkout/OrderSummary.tsx
+// OrderSummary: use the zustand cart store's items/total (not a non-existent `cart` property).
 'use client';
 
 import { Package, Truck, Shield } from 'lucide-react';
 import { useCartStore } from '@/src/stores';
 
 export const OrderSummary = () => {
-  const cart = useCartStore((s: any) => s.cart);
-
-  const items = Array.isArray(cart?.items) ? cart.items : [];
+  const items = useCartStore((s: any) => Array.isArray(s.items) ? s.items : []);
   const subtotal = items.reduce((sum: number, it: any) => {
-    const price = typeof it.product === 'object' ? Number(it.product.price ?? 0) : 0;
+    const price = typeof it.product === 'object' ? Number(it.product.price ?? 0) : Number(it.product ?? 0);
     return sum + price * Number(it.qty || 0);
   }, 0);
   const shipping = subtotal > 50 ? 0 : items.length ? 9.99 : 0;

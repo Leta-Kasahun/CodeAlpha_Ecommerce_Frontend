@@ -1,6 +1,4 @@
-// Fixed orders API matching backend response structure
-// Path: src/lib/api/orders.ts
-
+// Orders API client: returns backend envelope { success, message, order | orders | count } matching server responses
 import { apiConfig } from './config';
 import { Order } from '@/src/types';
 
@@ -15,22 +13,37 @@ interface CreateOrderData {
 
 interface OrdersResponse {
   success: boolean;
-  count: number;
-  orders: Order[];
+  count?: number;
+  orders?: Order[];
+  message?: string;
 }
 
 interface OrderResponse {
   success: boolean;
-  order: Order;
+  order?: Order;
+  message?: string;
+}
+
+interface OrderHistoryParams {
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  limit?: number;
 }
 
 interface OrderHistoryResponse {
   success: boolean;
-  message: string;
-  orders: Order[];
+  message?: string;
+  orders?: Order[];
   total?: number;
   page?: number;
   pages?: number;
+  limit?: number;
+  hasNext?: boolean;
+  hasPrev?: boolean;
 }
 
 export const ordersAPI = {
@@ -56,9 +69,20 @@ export const ordersAPI = {
     });
   },
 
-  getOrderHistory: async (token: string, params?: any): Promise<OrderHistoryResponse> => {
-    const queryParams = new URLSearchParams(params).toString();
-    const url = `/api/order-history${queryParams ? `?${queryParams}` : ''}`;
+  getOrderHistory: async (token: string, params?: OrderHistoryParams): Promise<OrderHistoryResponse> => {
+    const queryParams = new URLSearchParams();
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, String(value));
+        }
+      });
+    }
+    
+    const queryString = queryParams.toString();
+    const url = `/api/order-history${queryString ? `?${queryString}` : ''}`;
+    
     return apiConfig.authRequest(url, token);
   },
 };

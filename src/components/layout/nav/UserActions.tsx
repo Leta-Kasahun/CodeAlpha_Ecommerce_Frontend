@@ -36,15 +36,6 @@ export function UserActions() {
   return (
     <div className="flex items-center space-x-3">
       <button
-        aria-label="Wishlist"
-        className="p-2 text-gray-700 hover:text-[#5156D2] transition-colors relative group rounded-md"
-      >
-        <Heart className="h-5 w-5 group-hover:scale-110 transition-transform" />
-        <span className="sr-only">Wishlist</span>
-        <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#E6B84A] rounded-full animate-pulse" />
-      </button>
-
-      <button
         onClick={() => setCartSidebarOpen(true)}
         aria-label="Cart"
         className="p-2 text-gray-700 hover:text-[#5156D2] transition-colors relative group rounded-md"

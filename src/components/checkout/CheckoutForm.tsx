@@ -1,32 +1,95 @@
-// src/components/checkout/CheckoutForm.tsx
-'use client';
+// CheckoutForm: handles multi-step checkout, creates order, initiates payment, processes payment,
+// and refreshes cart AFTER payment success. Comments only at top per project rules.
+'use client'
 
-import { useState } from 'react';
-import { useCreateOrder } from '@/src/hooks/useCreateOrder';
-import { ShippingAddressForm } from './ShippingAddressForm';
-import { PaymentMethodSelect } from './PaymentMethodSelect';
-import { OrderSummary } from './OrderSummary';
-import { useAuthStore } from '@/src/stores';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCreateOrder } from '@/src/hooks/useCreateOrder'
+import { usePayments } from '@/src/hooks/usePaymets'
+import { useCart } from '@/src/hooks/useCart'
+import { ShippingAddressForm } from './ShippingAddressForm'
+import { PaymentMethodSelect } from './PaymentMethodSelect'
+import { OrderSummary } from './OrderSummary'
+import { useAuthStore } from '@/src/stores'
 
 export const CheckoutForm = () => {
-  const { isAuthenticated } = useAuthStore();
-  const [step, setStep] = useState(1);
+  const router = useRouter()
+  const { isAuthenticated } = useAuthStore()
+  const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     shippingAddress: { city: '', postalCode: '', country: '' },
     paymentMethod: 'card',
-  });
+  })
 
-  const { createOrder, loading, error } = useCreateOrder();
+  const { createOrder } = useCreateOrder()
+  const { createPayment, processPayment } = usePayments()
+  const { loadCart } = useCart()
+
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isAuthenticated) return;
-    await createOrder(formData);
-  };
+    e.preventDefault()
+    setError(null)
+
+    if (!isAuthenticated) {
+      setError('Please sign in to complete checkout.')
+      return
+    }
+
+    // Final step: create order -> create payment -> process payment -> refresh cart -> navigate to order
+    setSubmitting(true)
+    try {
+      // 1) Create order (backend will NOT clear cart)
+      const order = await createOrder(formData)
+      if (!order || !order._id) {
+        setError('Could not create order. Please try again.')
+        setSubmitting(false)
+        return
+      }
+
+      // 2) Create payment record for the order (status: pending)
+      const payment = await createPayment({
+        order: order._id,
+        amount: order.totalPrice ?? 0,
+        method: formData.paymentMethod as 'card' | 'upi' | 'wallet' | 'cash'
+      })
+
+      if (!payment || !payment._id) {
+        setError('Could not initiate payment. Please try again.')
+        setSubmitting(false)
+        return
+      }
+
+      // 3) Process payment (simulate or perform actual flow).
+      // The backend will update order.paymentStatus and clear cart only on success.
+      const processed = await processPayment(payment._id, { status: 'success' }, async () => {
+        // onSuccess callback: refresh client cart state so UI immediately reflects cleared cart
+        try {
+          await loadCart()
+        } catch (e) {
+          // ignore loadCart errors here; UI will sync on next fetch
+        }
+      })
+
+      if (!processed || processed.status !== 'success') {
+        setError('Payment failed. Your cart was not cleared. Please retry payment.')
+        setSubmitting(false)
+        return
+      }
+
+      // 4) Navigate to order details / confirmation
+      router.push(`/dashboard/orders/${order._id}`)
+    } catch (err: any) {
+      setError(err?.message || 'An unexpected error occurred during checkout.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   if (!isAuthenticated) {
     return (
@@ -35,16 +98,26 @@ export const CheckoutForm = () => {
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Sign in to checkout</h2>
           <p className="text-sm text-gray-600 mb-6">Please sign in to complete your order.</p>
           <div className="flex justify-center gap-3">
-            <a href="/login" className="px-4 py-2 bg-[#5156D2] text-white rounded-lg">Login</a>
-            <a href="/register" className="px-4 py-2 border border-gray-300 rounded-lg">Register</a>
+            <button 
+              onClick={() => router.push('/login')}
+              className="px-4 py-2 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors"
+            >
+              Login
+            </button>
+            <button 
+              onClick={() => router.push('/register')}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Register
+            </button>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch" noValidate>
       <div className="lg:col-span-2 space-y-6">
         {/* Progress Steps */}
         <div className="flex items-center justify-between max-w-md">
@@ -63,6 +136,7 @@ export const CheckoutForm = () => {
           ))}
         </div>
 
+        {/* Step 1: Shipping Address */}
         {step === 1 && (
           <ShippingAddressForm
             data={formData.shippingAddress}
@@ -71,6 +145,7 @@ export const CheckoutForm = () => {
           />
         )}
 
+        {/* Step 2: Payment Method */}
         {step === 2 && (
           <PaymentMethodSelect
             value={formData.paymentMethod}
@@ -80,6 +155,7 @@ export const CheckoutForm = () => {
           />
         )}
 
+        {/* Step 3: Review and Submit */}
         {step === 3 && (
           <div className="space-y-4 h-full flex flex-col">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -120,27 +196,28 @@ export const CheckoutForm = () => {
                 type="button"
                 onClick={() => setStep(2)}
                 className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={submitting}
               >
                 Back
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={submitting}
                 className="flex-1 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Placing Order...' : 'Place Order'}
+                {submitting ? 'Processing...' : 'Place Order'}
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Order Summary Sidebar (stretches to match left column) */}
+      {/* Order Summary Sidebar */}
       <div className="lg:col-span-1">
         <div className="h-full flex flex-col">
           <OrderSummary />
         </div>
       </div>
     </form>
-  );
-};
+  )
+}

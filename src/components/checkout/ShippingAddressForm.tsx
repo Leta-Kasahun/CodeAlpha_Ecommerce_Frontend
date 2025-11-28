@@ -1,35 +1,39 @@
-// src/components/checkout/ShippingAddressForm.tsx
-'use client';
+// File: src/components/checkout/ShippingAddressForm.tsx
+// Purpose: Form for collecting and validating shipping address information
+'use client'
 
-import { MapPin, ArrowRight } from 'lucide-react';
-import { useState as reactUseState, Dispatch, SetStateAction } from 'react';
+import { MapPin, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
 
 interface ShippingAddressFormProps {
-  data: { city: string; postalCode: string; country: string };
-  onChange: (data: any) => void;
-  onNext: () => void;
+  data: { city: string; postalCode: string; country: string }
+  onChange: (data: any) => void
+  onNext: () => void
 }
 
 export const ShippingAddressForm = ({ data, onChange, onNext }: ShippingAddressFormProps) => {
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
+  // Validate all form fields before proceeding
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!data.city.trim()) newErrors.city = 'City is required';
-    if (!data.postalCode.trim()) newErrors.postalCode = 'Postal code is required';
-    if (!data.country.trim()) newErrors.country = 'Country is required';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    const newErrors: { [key: string]: string } = {}
+    if (!data.city.trim()) newErrors.city = 'City is required'
+    if (!data.postalCode.trim()) newErrors.postalCode = 'Postal code is required'
+    if (!data.country.trim()) newErrors.country = 'Country is required'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
+  // Handle next step with validation
   const handleNext = () => {
-    if (validateForm()) onNext();
-  };
+    if (validateForm()) onNext()
+  }
 
+  // Update field value and clear any existing error
   const handleInputChange = (field: string, value: string) => {
-    onChange({ ...data, [field]: value });
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
-  };
+    onChange({ ...data, [field]: value })
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }))
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
@@ -78,15 +82,16 @@ export const ShippingAddressForm = ({ data, onChange, onNext }: ShippingAddressF
         </div>
 
         <div className="flex justify-end pt-4">
-          <button type="button" onClick={handleNext} className="flex items-center gap-2 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors">
+          <button 
+            type="button" 
+            onClick={handleNext} 
+            className="flex items-center gap-2 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors"
+          >
             Continue to Payment
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
     </div>
-  );
-};
-function useState<T>(initial: T | (() => T)): [T, Dispatch<SetStateAction<T>>] {
-  return reactUseState<T>(initial as any);
+  )
 }

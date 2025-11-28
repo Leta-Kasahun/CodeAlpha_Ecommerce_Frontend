@@ -61,13 +61,6 @@ export function AnimatedLogo() {
             S
           </motion.text>
         </svg>
-
-        {/* Floating particles */}
-        <motion.div
-          className="absolute -top-1 -right-1 w-2 h-2 bg-[#E6B84A] rounded-full"
-          animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-          transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
-        />
       </motion.div>
 
       <motion.div variants={textVariants} initial="hidden" animate="visible" className="flex flex-col">

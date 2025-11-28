@@ -40,6 +40,10 @@
   --border: var(--color-border);
   --input: var(--color-bg);
   --ring: var(--color-focus-ring);
+
+  /* Modern Font Variables - ADDED */
+  --font-geist-sans: 'Geist Sans', sans-serif;
+  --font-geist-mono: 'Geist Mono', monospace;
 }
 
 .dark {
@@ -72,9 +76,54 @@
     color: var(--foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* ADDED: Apply modern font to entire app */
+    font-family: var(--font-geist-sans);
   }
 
-  /* Custom utility classes */
+  /* ADDED: Modern typography system */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-geist-sans);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-text-primary);
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+  }
+
+  p, span, div {
+    font-family: var(--font-geist-sans);
+    color: var(--color-text-primary);
+  }
+
+  /* ADDED: Monospace for specific elements */
+  code, pre, .mono, .price, .sku {
+    font-family: var(--font-geist-mono);
+  }
+
+  /* Your existing custom utility classes */
   .bg-soft { 
     background-color: var(--color-bg-soft); 
   }
@@ -108,6 +157,8 @@
     font-weight: 700;
     transition: all 0.2s;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* ADDED: Ensure buttons use the same font */
+    font-family: var(--font-geist-sans);
   }
   
   .btn-primary:hover { 
@@ -123,6 +174,8 @@
     font-weight: 700;
     transition: all 0.2s;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* ADDED: Ensure buttons use the same font */
+    font-family: var(--font-geist-sans);
   }
   
   .btn-secondary:hover { 
@@ -138,6 +191,8 @@
     font-weight: 600;
     transition: all 0.2s;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    /* ADDED: Ensure buttons use the same font */
+    font-family: var(--font-geist-sans);
   }
   
   .btn-footer:hover { 
@@ -157,11 +212,15 @@
     background: var(--color-bg);
     padding: 0.75rem;
     border-radius: 0.5rem;
+    /* ADDED: Ensure form elements use the same font */
+    font-family: var(--font-geist-sans);
   }
 
   /* Links */
   a.cta { 
     color: var(--color-primary); 
+    /* ADDED: Ensure links use the same font */
+    font-family: var(--font-geist-sans);
   }
 
   /* Gradients */
@@ -187,4 +246,13 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+}
+
+/* ADDED: Additional font utility classes */
+.font-mono {
+  font-family: var(--font-geist-mono);
+}
+
+.font-sans {
+  font-family: var(--font-geist-sans);
 }

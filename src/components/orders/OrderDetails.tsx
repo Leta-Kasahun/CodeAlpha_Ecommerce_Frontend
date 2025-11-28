@@ -1,4 +1,4 @@
-// src/components/orders/OrderDetails.tsx
+// OrderDetails: shows order info; uses useOrder hook to fetch single order and handle actions.
 'use client';
 
 import { useOrder } from '@/src/hooks/useOrder';
@@ -38,7 +38,7 @@ export const OrderDetails = ({ orderId }: OrderDetailsProps) => {
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">{error}</h3>
           <button
-            onClick={refetchOrder}
+            onClick={() => refetchOrder()}
             className="px-4 py-2 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors"
           >
             Try Again

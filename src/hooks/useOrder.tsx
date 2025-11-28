@@ -1,89 +1,70 @@
-// src/hooks/useOrder.ts
+// useOrder: fetch a single order by id and expose status update and refetch helpers.
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 import { ordersAPI } from '@/src/lib/api/orders';
 import { Order } from '@/src/types';
 import { useAuthStore } from '@/src/stores';
 
-interface UseOrderReturn {
-  order: Order | null;
-  loading: boolean;
-  error: string | null;
-  updateOrderStatus: (newStatus: string) => Promise<void>;
-  refetchOrder: () => Promise<void>;
-}
-
-export const useOrder = (orderId: string): UseOrderReturn => {
+export const useOrder = (orderId: string | undefined) => {
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(Boolean(orderId));
   const [error, setError] = useState<string | null>(null);
-  
-  const router = useRouter();
+
   const { token, isAuthenticated, logout } = useAuthStore();
 
-  const handleAuthError = () => {
-    logout();
-    router.push('/login');
-  };
+  const fetchOrder = useCallback(async () => {
+    if (!orderId) return;
+    if (!isAuthenticated || !token) {
+      setError('Not authenticated');
+      return;
+    }
 
-  const fetchOrder = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      
-      if (!isAuthenticated || !token) {
-        handleAuthError();
-        return;
-      }
-
-      const response = await ordersAPI.getOrder(orderId, token);
-      
-      if (response.success) {
-        setOrder(response.order);
+      const res = await ordersAPI.getOrder(orderId, token);
+      if (res && res.success && res.order) {
+        setOrder(res.order);
+      } else {
+        setOrder(null);
+        setError(res?.message || 'Order not found');
       }
     } catch (err: any) {
-      if (err.message?.includes('Invalid token') || err.message?.includes('Authentication')) {
-        handleAuthError();
-      } else if (err.message?.includes('Order not found')) {
-        setError('Order not found');
-      } else {
-        setError('Failed to fetch order details');
-        console.error('Error fetching order:', err);
-      }
+      setError(err?.message || 'Failed to load order');
+      setOrder(null);
     } finally {
       setLoading(false);
     }
-  };
-
-  const updateOrderStatus = async (newStatus: string) => {
-    try {
-      if (!isAuthenticated || !token) {
-        handleAuthError();
-        return;
-      }
-
-      const response = await ordersAPI.updateOrderStatus(orderId, newStatus, token);
-      
-      if (response.success) {
-        setOrder(prev => prev ? { ...prev, orderStatus: newStatus } : null);
-      }
-    } catch (err: any) {
-      if (err.message?.includes('Invalid token') || err.message?.includes('Authentication')) {
-        handleAuthError();
-      } else {
-        console.error('Error updating order status:', err);
-        throw err;
-      }
-    }
-  };
+  }, [orderId, isAuthenticated, token]);
 
   useEffect(() => {
-    if (isAuthenticated && token && orderId) {
+    if (orderId && isAuthenticated && token) {
       fetchOrder();
-    } else {
-      handleAuthError();
+    }
+  }, [orderId, isAuthenticated, token, fetchOrder]);
+
+  const refetchOrder = useCallback(async () => {
+    await fetchOrder();
+  }, [fetchOrder]);
+
+  const updateOrderStatus = useCallback(async (newStatus: string) => {
+    if (!orderId) throw new Error('Order id missing');
+    if (!isAuthenticated || !token) {
+      throw new Error('Not authenticated');
+    }
+
+    try {
+      const res = await ordersAPI.updateOrderStatus(orderId, newStatus, token);
+      if (res && res.success && (res as any).order) {
+        setOrder((res as any).order as Order);
+      } else {
+        // fallback: optimistic update
+        setOrder(prev => prev ? { ...prev, orderStatus: newStatus } : prev);
+      }
+      return true;
+    } catch (err) {
+      throw err;
     }
   }, [orderId, isAuthenticated, token]);
 
@@ -92,6 +73,6 @@ export const useOrder = (orderId: string): UseOrderReturn => {
     loading,
     error,
     updateOrderStatus,
-    refetchOrder: fetchOrder,
+    refetchOrder
   };
 };

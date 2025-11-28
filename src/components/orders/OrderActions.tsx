@@ -1,4 +1,4 @@
-// src/components/orders/OrderActions.tsx
+// OrderActions: control to advance order status. Accept optional parent isUpdating to avoid prop type mismatch and UI race conditions.
 'use client';
 
 import { useState } from 'react';
@@ -7,18 +7,20 @@ import { Order } from '@/src/types';
 interface OrderActionsProps {
   currentStatus: Order['orderStatus'];
   onStatusUpdate: (status: string) => Promise<void>;
+  isUpdating?: boolean; // optional controlled flag from parent
 }
 
-export const OrderActions = ({ currentStatus, onStatusUpdate }: OrderActionsProps) => {
-  const [isUpdating, setIsUpdating] = useState(false);
+export const OrderActions = ({ currentStatus, onStatusUpdate, isUpdating: parentUpdating }: OrderActionsProps) => {
+  const [internalUpdating, setInternalUpdating] = useState(false);
+  const isUpdating = typeof parentUpdating === 'boolean' ? parentUpdating : internalUpdating;
 
   const getNextStatus = (current: Order['orderStatus']) => {
-    const statusFlow = {
+    const statusFlow: Record<string, { next: string; label: string; color: string } | null> = {
       processing: { next: 'shipped', label: 'Mark as Shipped', color: 'bg-[#5156D2] hover:bg-[#4347c4]' },
       shipped: { next: 'completed', label: 'Mark as Completed', color: 'bg-green-600 hover:bg-green-700' },
       completed: null,
     };
-    return statusFlow[current];
+    return statusFlow[current] ?? null;
   };
 
   const handleStatusUpdate = async () => {
@@ -26,12 +28,12 @@ export const OrderActions = ({ currentStatus, onStatusUpdate }: OrderActionsProp
     if (!nextStatusInfo) return;
 
     try {
-      setIsUpdating(true);
+      if (typeof parentUpdating !== 'boolean') setInternalUpdating(true);
       await onStatusUpdate(nextStatusInfo.next);
     } catch (error) {
       console.error('Failed to update order status:', error);
     } finally {
-      setIsUpdating(false);
+      if (typeof parentUpdating !== 'boolean') setInternalUpdating(false);
     }
   };
 
@@ -64,7 +66,6 @@ export const OrderActions = ({ currentStatus, onStatusUpdate }: OrderActionsProp
           {isUpdating ? 'Updating...' : nextStatusInfo.label}
         </button>
 
-        {/* Additional Actions */}
         <div className="grid grid-cols-2 gap-2">
           <button className="px-3 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
             Print Invoice
