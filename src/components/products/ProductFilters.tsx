@@ -1,12 +1,9 @@
-// Product filters component
-// Path: src/components/products/ProductFilters.tsx
-
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const categories = [
-  { value: '', label: 'All Categories' },
+  { value: '', label: 'All' },
   { value: 'clothing', label: 'Clothing' },
   { value: 'accessories', label: 'Accessories' },
   { value: 'bags', label: 'Bags' },
@@ -31,12 +28,12 @@ export function ProductFilters() {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-3">
       {categories.map((category) => (
         <button
           key={category.value}
           onClick={() => handleCategoryChange(category.value)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-8 py-3 rounded-lg text-sm font-medium transition-all ${
             currentCategory === category.value
               ? 'bg-[#5156D2] text-white'
               : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
