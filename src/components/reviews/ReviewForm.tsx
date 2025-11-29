@@ -6,21 +6,22 @@ import { StarRating } from './StarRating'
 
 interface ReviewFormProps {
   productId: string
-  onSubmit: (data: { rating: number; comment: string }) => Promise<void>
+  onSubmit: (data: { rating: number; comment: string }) => Promise<boolean>
   loading?: boolean
   editReview?: { rating: number; comment: string }
   onCancel?: () => void
 }
 
-export const ReviewForm = ({ onSubmit, loading, editReview, onCancel }: ReviewFormProps) => {
+export const ReviewForm = ({ productId, onSubmit, loading, editReview, onCancel }: ReviewFormProps) => {
   const [rating, setRating] = useState(editReview?.rating || 0)
   const [comment, setComment] = useState(editReview?.comment || '')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (rating === 0) return
-    await onSubmit({ rating, comment })
-    if (!editReview) {
+    
+    const success = await onSubmit({ rating, comment })
+    if (success && !editReview) {
       setRating(0)
       setComment('')
     }
@@ -35,7 +36,11 @@ export const ReviewForm = ({ onSubmit, loading, editReview, onCancel }: ReviewFo
       <div className="space-y-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-2">Rating *</label>
-          <StarRating rating={rating} onRatingChange={setRating} size={20} />
+          <StarRating 
+            rating={rating} 
+            onRatingChange={setRating} 
+            size={20} 
+          />
         </div>
 
         <div>
@@ -44,8 +49,8 @@ export const ReviewForm = ({ onSubmit, loading, editReview, onCancel }: ReviewFo
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Share your experience..."
-            rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5156D2] text-sm"
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5156D2] focus:border-transparent text-sm resize-none"
           />
         </div>
 
@@ -53,15 +58,15 @@ export const ReviewForm = ({ onSubmit, loading, editReview, onCancel }: ReviewFo
           <button
             type="submit"
             disabled={loading || rating === 0}
-            className="px-3 py-2 bg-[#5156D2] text-white rounded-lg text-sm disabled:opacity-50"
+            className="px-4 py-2 bg-[#5156D2] text-white rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-[#4347C2] transition-colors"
           >
-            {loading ? '...' : editReview ? 'Update' : 'Submit'}
+            {loading ? 'Submitting...' : editReview ? 'Update Review' : 'Submit Review'}
           </button>
           {editReview && (
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>

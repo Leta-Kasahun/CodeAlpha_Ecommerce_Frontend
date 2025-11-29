@@ -1,4 +1,4 @@
-// Featured products with working cart functionality
+// Featured products with working cart functionality and review ratings
 // Path: src/components/home/FeaturedProducts.tsx
 
 'use client'
@@ -6,11 +6,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { productsAPI } from '@/src/lib/api/products'
+import { useProductRatings } from '@/src/hooks/useProductRatings'
 import { AddToCartButton } from '@/src/components/cart/AddToCartButton'
+import { StarRating } from '@/src/components/reviews/StarRating'
 
 export function FeaturedProducts() {
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const { getProductsRatings } = useProductRatings()
   const router = useRouter()
 
   useEffect(() => {
@@ -18,7 +21,24 @@ export function FeaturedProducts() {
       try {
         const response = await productsAPI.getProducts()
         const allProducts = response.products || response || []
-        setProducts(allProducts.slice(0, 8))
+        const featuredProducts = allProducts.slice(0, 8)
+        
+        // Load ratings for featured products
+        if (featuredProducts.length > 0) {
+          const productIds = featuredProducts.map((p: any) => p._id)
+          const ratings = await getProductsRatings(productIds)
+          
+          // Merge products with their ratings
+          const productsWithRatings = featuredProducts.map((product: any) => ({
+            ...product,
+            averageRating: ratings[product._id]?.averageRating || 0,
+            reviewCount: ratings[product._id]?.reviewCount || 0
+          }))
+          
+          setProducts(productsWithRatings)
+        } else {
+          setProducts(featuredProducts)
+        }
       } catch (error) {
         console.error('Error loading products:', error)
         setProducts([])
@@ -28,7 +48,7 @@ export function FeaturedProducts() {
     }
 
     loadFeaturedProducts()
-  }, [])
+  }, [getProductsRatings])
 
   if (loading) {
     return (
@@ -55,8 +75,9 @@ export function FeaturedProducts() {
             {products.map((product: any) => (
               <div
                 key={product._id}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col"
               >
+                {/* Product Image - UNCHANGED */}
                 <div 
                   className="aspect-square bg-gray-100 relative overflow-hidden cursor-pointer"
                   onClick={() => router.push(`/products/${product._id}`)}
@@ -74,12 +95,31 @@ export function FeaturedProducts() {
                   )}
                 </div>
 
-                <div className="p-4 space-y-3">
-                  <h3 className="font-semibold text-gray-900 text-sm md:text-base line-clamp-2">
+                {/* Product Info - UPDATED with review ratings */}
+                <div className="p-4 space-y-3 flex-1 flex flex-col">
+                  <h3 className="font-semibold text-gray-900 text-sm md:text-base line-clamp-2 flex-1">
                     {product.name}
                   </h3>
                   
-                  <div className="flex items-center justify-between">
+                  {/* NEW: Review Ratings */}
+                  <div className="flex items-center gap-2">
+                    {product.averageRating > 0 ? (
+                      <>
+                        <StarRating 
+                          rating={product.averageRating} 
+                          size={14} 
+                          readonly 
+                        />
+                        <span className="text-xs text-gray-600">
+                          ({product.reviewCount || 0})
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xs text-gray-500">No reviews yet</span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-auto">
                     <span className="text-lg md:text-xl font-bold text-[#5156D2]">
                       ${product.price}
                     </span>

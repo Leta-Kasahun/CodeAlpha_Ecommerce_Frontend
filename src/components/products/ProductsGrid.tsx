@@ -1,4 +1,4 @@
-// Products grid with view details button
+// Products grid with view details button and review ratings
 // Path: src/components/products/ProductsGrid.tsx
 
 'use client'
@@ -7,15 +7,17 @@ import { Package, Eye } from 'lucide-react'
 import { AddToCartButton } from '@/src/components/cart/AddToCartButton'
 import { ProductsGridSkeleton } from './ProductsGridSkeleton'
 import { Button } from '@/src/components/ui/button'
+import { StarRating } from '@/src/components/reviews/StarRating'
 
 interface ProductsGridProps {
   products: any[]
   loading: boolean
   error: string
   onRetry: () => void
+  showRatings?: boolean // NEW: Optional ratings display
 }
 
-export function ProductsGrid({ products, loading, error, onRetry }: ProductsGridProps) {
+export function ProductsGrid({ products, loading, error, onRetry, showRatings = false }: ProductsGridProps) {
   if (loading) {
     return <ProductsGridSkeleton />
   }
@@ -58,7 +60,7 @@ export function ProductsGrid({ products, loading, error, onRetry }: ProductsGrid
           key={product._id}
           className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col"
         >
-          {/* Product Image */}
+          {/* Product Image - UNCHANGED */}
           <div 
             className="aspect-square bg-gray-100 relative overflow-hidden cursor-pointer"
             onClick={() => window.location.href = `/products/${product._id}`}
@@ -76,11 +78,31 @@ export function ProductsGrid({ products, loading, error, onRetry }: ProductsGrid
             )}
           </div>
 
-          {/* Product Info */}
+          {/* Product Info - UPDATED with review ratings */}
           <div className="p-4 space-y-3 flex-1 flex flex-col">
             <h3 className="font-semibold text-gray-900 text-sm md:text-base line-clamp-2 flex-1">
               {product.name}
             </h3>
+            
+            {/* NEW: Review Ratings Section */}
+            {showRatings && (
+              <div className="flex items-center gap-2">
+                {product.averageRating > 0 ? (
+                  <>
+                    <StarRating 
+                      rating={product.averageRating} 
+                      size={14} 
+                      readonly 
+                    />
+                    <span className="text-xs text-gray-600">
+                      ({product.reviewCount || 0})
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-xs text-gray-500">No reviews yet</span>
+                )}
+              </div>
+            )}
             
             <div className="flex items-center justify-between mt-auto space-x-2">
               <span className="text-lg md:text-xl font-bold text-[#5156D2]">
@@ -88,7 +110,7 @@ export function ProductsGrid({ products, loading, error, onRetry }: ProductsGrid
               </span>
               
               <div className="flex space-x-1">
-                {/* View Details Button */}
+                {/* View Details Button - UNCHANGED */}
                 <Button
                   onClick={() => window.location.href = `/products/${product._id}`}
                   className="bg-white text-[#5156D2] hover:bg-gray-100 border border-[#5156D2] p-2"
@@ -97,7 +119,7 @@ export function ProductsGrid({ products, loading, error, onRetry }: ProductsGrid
                   <Eye className="h-4 w-4" />
                 </Button>
                 
-                {/* Add to Cart Button */}
+                {/* Add to Cart Button - UNCHANGED */}
                 <AddToCartButton
                   productId={product._id}
                   productName={product.name}

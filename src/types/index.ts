@@ -94,7 +94,29 @@ export interface Review {
   updatedAt: string
 }
 
+export interface CreateReviewData {
+  product: string;
+  rating: number;
+  comment?: string;
+}
 
+export interface UpdateReviewData {
+  rating?: number;
+  comment?: string;
+}
+
+export interface ReviewResponse {
+  success: boolean;
+  review?: Review;
+  message?: string;
+}
+
+export interface ReviewsResponse {
+  success: boolean;
+  reviews?: Review[];
+  count?: number;
+  message?: string;
+}
 export interface SellerProfile {
   _id: string
   user: string | User

@@ -1,4 +1,3 @@
-// File: src/lib/api/reviews.ts - FIXED RESPONSE HANDLING
 import { apiConfig } from './config';
 import { Review } from '@/src/types';
 

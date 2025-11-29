@@ -1,5 +1,4 @@
 // File: src/components/products/ProductCard.tsx
-// ProductCard: displays product information with integrated review ratings
 'use client'
 
 import { Package, ShoppingCart } from 'lucide-react'
@@ -14,9 +13,16 @@ interface ProductCardProps {
   onAddToCart: (product: any) => void
   averageRating?: number
   reviewCount?: number
+  lastReviewDate?: string // Add this for date display
 }
 
-export function ProductCard({ product, onAddToCart, averageRating, reviewCount }: ProductCardProps) {
+export function ProductCard({ 
+  product, 
+  onAddToCart, 
+  averageRating, 
+  reviewCount,
+  lastReviewDate 
+}: ProductCardProps) {
   const router = useRouter()
   const { 
     _id, 
@@ -31,9 +37,20 @@ export function ProductCard({ product, onAddToCart, averageRating, reviewCount }
 
   const isOutOfStock = !isAvailable || quantity === 0
 
+  // Format date for display
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  const formattedDate = formatDate(lastReviewDate)
+
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 h-full flex flex-col">
-      {/* Product Image */}
+      {/* Product Image - UNCHANGED */}
       <div 
         className="aspect-square bg-gray-50 relative overflow-hidden cursor-pointer"
         onClick={() => router.push(`/products/${_id}`)}
@@ -50,7 +67,7 @@ export function ProductCard({ product, onAddToCart, averageRating, reviewCount }
           </div>
         )}
         
-        {/* Availability Badge */}
+        {/* Availability Badge - UNCHANGED */}
         <div className="absolute top-3 left-3">
           <Badge 
             variant={isOutOfStock ? "destructive" : "default"}
@@ -64,7 +81,7 @@ export function ProductCard({ product, onAddToCart, averageRating, reviewCount }
           </Badge>
         </div>
 
-        {/* Category Badge */}
+        {/* Category Badge - UNCHANGED */}
         {category && (
           <div className="absolute top-3 right-3">
             <Badge 
@@ -78,7 +95,7 @@ export function ProductCard({ product, onAddToCart, averageRating, reviewCount }
       </div>
 
       <CardContent className="p-4 flex-1 flex flex-col">
-        {/* Product Name */}
+        {/* Product Name - UNCHANGED */}
         <h3 
           className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm md:text-base cursor-pointer hover:text-[#5156D2]"
           onClick={() => router.push(`/products/${_id}`)}
@@ -86,38 +103,42 @@ export function ProductCard({ product, onAddToCart, averageRating, reviewCount }
           {name}
         </h3>
         
-        {/* Review Rating */}
-        {averageRating !== undefined && averageRating > 0 && (
-          <div className="flex items-center gap-2 mb-2">
-            <StarRating rating={averageRating} size={14} readonly />
-            <span className="text-xs text-gray-600">({reviewCount || 0})</span>
+        {/* NEW: Review Stats Section - Added at bottom */}
+        <div className="mt-auto space-y-2">
+          {/* Review Rating with Date */}
+          {averageRating !== undefined && averageRating > 0 ? (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <StarRating rating={averageRating} size={14} readonly />
+                <span className="text-xs text-gray-600">({reviewCount})</span>
+              </div>
+              {formattedDate && (
+                <p className="text-xs text-gray-500">
+                  Last review: {formattedDate}
+                </p>
+              )}
+            </div>
+          ) : (
+            /* No reviews state - keeps same spacing */
+            <div className="h-8 flex items-center">
+              <p className="text-xs text-gray-500">No reviews yet</p>
+            </div>
+          )}
+          
+          {/* Price and Add to Cart - MOVED BELOW REVIEWS */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div>
+              <p className="text-lg md:text-xl font-bold text-[#5156D2]">${price}</p>
+            </div>
+            <Button
+              onClick={() => onAddToCart(product)}
+              disabled={isOutOfStock}
+              className="bg-[#5156D2] hover:bg-[#5156D2]/90 text-white text-sm font-medium py-1 h-8 px-3"
+            >
+              <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-1" />
+              Add
+            </Button>
           </div>
-        )}
-        
-        {/* Description */}
-        {description && (
-          <p className="text-xs md:text-sm text-gray-600 mb-3 line-clamp-2 flex-1">
-            {description}
-          </p>
-        )}
-        
-        {/* Price and Add to Cart */}
-        <div className="mt-auto flex items-center justify-between">
-          <div>
-            <p className="text-lg md:text-xl font-bold text-[#5156D2]">${price}</p>
-            {/* Show "No reviews yet" if product has no reviews */}
-            {(!averageRating || averageRating === 0) && (
-              <p className="text-xs text-gray-500 mt-1">No reviews yet</p>
-            )}
-          </div>
-          <Button
-            onClick={() => onAddToCart(product)}
-            disabled={isOutOfStock}
-            className="bg-[#5156D2] hover:bg-[#5156D2]/90 text-white text-sm font-medium py-1 h-8 px-3"
-          >
-            <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-1" />
-            Add
-          </Button>
         </div>
       </CardContent>
     </Card>
