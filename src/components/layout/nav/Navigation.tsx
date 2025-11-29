@@ -1,4 +1,3 @@
-// src/components/layout/Navigation.tsx
 'use client';
 
 import {
@@ -7,65 +6,62 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import { Shirt, ShoppingBag, Footprints, Watch } from 'lucide-react';
-import { useCategories } from '@/src/hooks/useCategories';
+import { ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-const iconComponents = {
-  Shirt: Shirt,
-  ShoppingBag: ShoppingBag,
-  Footprints: Footprints,
-  Watch: Watch,
-};
+const categories = [
+  { id: 'clothing', name: 'Clothing', href: '/products/clothing' },
+  { id: 'footwear', name: 'Footwear', href: '/products/footwear' },
+  { id: 'bags', name: 'Bags', href: '/products/bags' },
+  { id: 'accessory', name: 'Accessory', href: '/products/accessory' }
+];
 
 export function Navigation() {
-  const { categories, handleCategoryClick } = useCategories();
+  const router = useRouter();
+
+  const handleCategoryClick = (href: string) => {
+    router.push(href);
+  };
 
   return (
-    <nav className="flex items-center space-x-1">
-      {categories.map((category) => {
-        const IconComponent = iconComponents[category.icon as keyof typeof iconComponents];
-        
-        return category.subcategories ? (
-          <DropdownMenu key={category.id}>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-1 px-4 py-2 text-gray-700 hover:text-[#5156D2] font-medium transition-colors duration-200 group">
-                <IconComponent className="h-4 w-4" />
-                <span>{category.name}</span>
-                <svg className="h-4 w-4 transform group-hover:rotate-180 transition-transform" 
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-              {category.subcategories.map((subcategory) => (
-                <DropdownMenuItem
-                  key={subcategory}
-                  onClick={() => handleCategoryClick(category.id, subcategory)}
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-[#5156D2] cursor-pointer capitalize"
-                >
-                  <span>{subcategory}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <button
-            key={category.id}
-            onClick={() => handleCategoryClick(category.id)}
-            className="flex items-center space-x-1 px-4 py-2 text-gray-700 hover:text-[#5156D2] font-medium transition-colors duration-200"
-          >
-            <IconComponent className="h-4 w-4" />
-            <span>{category.name}</span>
-          </button>
-        );
-      })}
+    <nav className="flex items-center space-x-8">
+      <button 
+        onClick={() => router.push('/')}
+        className="px-6 py-3 text-lg font-semibold text-gray-800 hover:text-[#5156D2] transition-colors duration-300"
+      >
+        Home
+      </button>
       
-      {/* About & Contact Links */}
-      <button className="px-4 py-2 text-gray-700 hover:text-[#5156D2] font-medium transition-colors duration-200">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center space-x-2 px-6 py-3 text-lg font-semibold text-gray-800 hover:text-[#5156D2] transition-colors duration-300 group">
+            <span>Products</span>
+            <ChevronDown className="h-5 w-5 transform group-hover:rotate-180 transition-transform duration-300" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56 bg-white border border-gray-200 rounded-xl shadow-xl">
+          {categories.map((category) => (
+            <DropdownMenuItem
+              key={category.id}
+              onClick={() => handleCategoryClick(category.href)}
+              className="px-6 py-4 text-base font-semibold text-gray-800 hover:bg-gray-50 hover:text-[#5156D2] cursor-pointer"
+            >
+              {category.name}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      <button 
+        onClick={() => router.push('/about')}
+        className="px-6 py-3 text-lg font-semibold text-gray-800 hover:text-[#5156D2] transition-colors duration-300"
+      >
         About
       </button>
-      <button className="px-4 py-2 text-gray-700 hover:text-[#5156D2] font-medium transition-colors duration-200">
+      <button 
+        onClick={() => router.push('/contact')}
+        className="px-6 py-3 text-lg font-semibold text-gray-800 hover:text-[#5156D2] transition-colors duration-300"
+      >
         Contact
       </button>
     </nav>

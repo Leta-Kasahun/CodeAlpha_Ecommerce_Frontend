@@ -25,7 +25,6 @@ const navigation = [
   { name: 'Cart', href: '/dashboard/cart', icon: ShoppingCart },
   { name: 'Orders', href: '/dashboard/orders', icon: ShoppingBag },
   { name: 'Wishlist', href: '/dashboard/wishlist', icon: Heart },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
@@ -48,7 +47,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         ${open ? 'translate-x-0' : '-translate-x-full'}
       `}>
         
-        {/* Header - Extends to top */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-[#5156D2] rounded-lg">

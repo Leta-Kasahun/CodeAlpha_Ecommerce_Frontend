@@ -6,10 +6,12 @@ import { PromoBanner } from '@/src/components/home/PromoBanner';
 import { Testimonials } from '@/src/components/home/Testimonials';
 import { Newsletter } from '@/src/components/home/Newsletter';
 import { PeopleAlsoAsk } from '@/src/components/home/PeopleAsoAsk';
+import { Header } from '../components/layout/nav/Header';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
+       <Header />
       <HeroSection />
       <FeaturedCategories />
       <FeaturedProducts />

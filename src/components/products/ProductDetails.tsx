@@ -1,6 +1,5 @@
-// Product details component with small buttons
-// Path: src/components/products/ProductDetails.tsx
-
+// File: src/components/products/ProductDetails.tsx - UPDATED POSITION
+// ProductDetails: displays product information with integrated reviews section
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -9,6 +8,7 @@ import { ArrowLeft, Package, Truck, Shield, Star, Eye } from 'lucide-react'
 import { productsAPI } from '@/src/lib/api/products'
 import { AddToCartButton } from '@/src/components/cart/AddToCartButton'
 import { Button } from '@/src/components/ui/button'
+import { ProductReviews } from '@/src/components/reviews/ProductReviews'
 
 interface ProductDetailsProps {
   productId: string
@@ -113,143 +113,150 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
           Back
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Images */}
-          <div className="space-y-4">
-            {/* Main Image */}
-            <div className="aspect-square bg-white rounded-lg border border-gray-200 overflow-hidden">
-              {product.images && product.images.length > 0 ? (
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                  <Package className="h-16 w-16" />
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Product Images */}
+            <div className="space-y-4">
+              {/* Main Image */}
+              <div className="aspect-square bg-white rounded-lg border border-gray-200 overflow-hidden">
+                {product.images && product.images.length > 0 ? (
+                  <img
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-300">
+                    <Package className="h-16 w-16" />
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnail Images */}
+              {product.images && product.images.length > 1 && (
+                <div className="flex space-x-2 overflow-x-auto">
+                  {product.images.map((image: string, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`flex-shrink-0 w-16 h-16 border-2 rounded-lg overflow-hidden ${
+                        selectedImage === index ? 'border-[#5156D2]' : 'border-gray-200'
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Thumbnail Images */}
-            {product.images && product.images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto">
-                {product.images.map((image: string, index: number) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 border-2 rounded-lg overflow-hidden ${
-                      selectedImage === index ? 'border-[#5156D2]' : 'border-gray-200'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
+            {/* Product Info */}
+            <div className="space-y-6">
+              {/* Category */}
+              {product.category && (
+                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm capitalize">
+                  {product.category}
+                </span>
+              )}
+
+              {/* Product Name */}
+              <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+
+              {/* Price */}
+              <div className="flex items-baseline space-x-2">
+                <span className="text-4xl font-bold text-[#5156D2]">${product.price}</span>
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <span className="text-lg text-gray-500 line-through">${product.originalPrice}</span>
+                )}
               </div>
-            )}
+
+              {/* Availability */}
+              <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                isOutOfStock 
+                  ? 'bg-red-100 text-red-800' 
+                  : 'bg-green-100 text-green-800'
+              }`}>
+                <Package className="h-4 w-4 mr-1" />
+                {isOutOfStock ? 'Out of Stock' : `In Stock (${product.quantity} available)`}
+              </div>
+
+              {/* Description */}
+              {product.description && (
+                <div className="prose max-w-none">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+                  <p className="text-gray-600 leading-relaxed">{product.description}</p>
+                </div>
+              )}
+
+              {/* Quantity Selector */}
+              {!isOutOfStock && (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm font-medium text-gray-900">Quantity:</span>
+                  <div className="flex items-center border border-gray-300 rounded-lg">
+                    <button
+                      onClick={() => handleQuantityChange(quantity - 1)}
+                      disabled={quantity <= 1}
+                      className="px-3 py-1 text-gray-600 hover:text-gray-900 disabled:opacity-50"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-1 text-gray-900 font-medium">{quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(quantity + 1)}
+                      disabled={quantity >= product.quantity}
+                      className="px-3 py-1 text-gray-600 hover:text-gray-900 disabled:opacity-50"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Add to Cart Buttons */}
+              {!isOutOfStock && (
+                <div className="flex space-x-3">
+                  <AddToCartButton
+                    productId={product._id}
+                    productName={product.name}
+                    disabled={isOutOfStock}
+                    size="sm"
+                    showText={true}
+                  />
+                  <Button
+                    onClick={() => router.push('/cart')}
+                    className="bg-[#E6B84A] hover:bg-[#d4a63f] text-white flex items-center space-x-2 px-3 py-2 text-sm"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>View Cart</span>
+                  </Button>
+                </div>
+              )}
+
+              {/* Features */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Truck className="h-5 w-5 text-[#5156D2]" />
+                  <span>Free Shipping</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Shield className="h-5 w-5 text-[#5156D2]" />
+                  <span>Secure Payment</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Star className="h-5 w-5 text-[#5156D2]" />
+                  <span>Quality Guarantee</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-6">
-            {/* Category */}
-            {product.category && (
-              <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm capitalize">
-                {product.category}
-              </span>
-            )}
-
-            {/* Product Name */}
-            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-
-            {/* Price */}
-            <div className="flex items-baseline space-x-2">
-              <span className="text-4xl font-bold text-[#5156D2]">${product.price}</span>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-lg text-gray-500 line-through">${product.originalPrice}</span>
-              )}
-            </div>
-
-            {/* Availability */}
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              isOutOfStock 
-                ? 'bg-red-100 text-red-800' 
-                : 'bg-green-100 text-green-800'
-            }`}>
-              <Package className="h-4 w-4 mr-1" />
-              {isOutOfStock ? 'Out of Stock' : `In Stock (${product.quantity} available)`}
-            </div>
-
-            {/* Description */}
-            {product.description && (
-              <div className="prose max-w-none">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                <p className="text-gray-600 leading-relaxed">{product.description}</p>
-              </div>
-            )}
-
-            {/* Quantity Selector */}
-            {!isOutOfStock && (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-900">Quantity:</span>
-                <div className="flex items-center border border-gray-300 rounded-lg">
-                  <button
-                    onClick={() => handleQuantityChange(quantity - 1)}
-                    disabled={quantity <= 1}
-                    className="px-3 py-1 text-gray-600 hover:text-gray-900 disabled:opacity-50"
-                  >
-                    -
-                  </button>
-                  <span className="px-4 py-1 text-gray-900 font-medium">{quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(quantity + 1)}
-                    disabled={quantity >= product.quantity}
-                    className="px-3 py-1 text-gray-600 hover:text-gray-900 disabled:opacity-50"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Add to Cart Buttons */}
-            {!isOutOfStock && (
-              <div className="flex space-x-3">
-                <AddToCartButton
-                  productId={product._id}
-                  productName={product.name}
-                  disabled={isOutOfStock}
-                  size="sm"
-                  showText={true}
-                />
-                <Button
-                  onClick={() => router.push('/cart')}
-                  className="bg-[#E6B84A] hover:bg-[#d4a63f] text-white flex items-center space-x-2 px-3 py-2 text-sm"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>View Cart</span>
-                </Button>
-              </div>
-            )}
-
-            {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Truck className="h-5 w-5 text-[#5156D2]" />
-                <span>Free Shipping</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Shield className="h-5 w-5 text-[#5156D2]" />
-                <span>Secure Payment</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Star className="h-5 w-5 text-[#5156D2]" />
-                <span>Quality Guarantee</span>
-              </div>
-            </div>
+          {/* Reviews Section - Positioned correctly below product info */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <ProductReviews productId={productId} />
           </div>
         </div>
       </div>

@@ -1,4 +1,6 @@
 // src/components/orders/OrderStatusBadge.tsx - UPDATED
+"use client";
+
 import { Order } from '@/src/types';
 
 interface OrderStatusBadgeProps {

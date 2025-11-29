@@ -1,4 +1,6 @@
 // src/components/orders/OrderStatusTimeline.tsx
+"use client";
+
 import { Order } from '@/src/types';
 import { Check, Clock, Package, Truck } from 'lucide-react';
 

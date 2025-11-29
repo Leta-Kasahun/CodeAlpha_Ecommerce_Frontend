@@ -1,4 +1,4 @@
-// User Types (matches User schema)
+
 export interface User {
   _id: string
   name: string
@@ -16,7 +16,7 @@ export interface User {
   updatedAt: string
 }
 
-// Product Types (matches Product schema)
+
 export interface Product {
   _id: string
   owner: string
@@ -31,7 +31,7 @@ export interface Product {
   updatedAt: string
 }
 
-// Cart Types (matches Cart schema)
+
 export interface CartItem {
   product: string | Product
   qty: number
@@ -46,7 +46,7 @@ export interface Cart {
   updatedAt: string
 }
 
-// Order Types (matches Order schema)
+
 export interface OrderItem {
   product: string | Product
   qty: number
@@ -63,6 +63,7 @@ export interface Order {
     country: string
   }
   totalPrice: number
+  amount?: number
   paymentMethod: 'card' | 'upi' | 'wallet' | 'cash'
   paymentStatus: 'pending' | 'paid'
   orderStatus: 'processing' | 'shipped' | 'completed'
@@ -70,7 +71,7 @@ export interface Order {
   updatedAt: string
 }
 
-// Payment Types (matches Payment schema)
+
 export interface Payment {
   _id: string
   order: string | Order
@@ -83,7 +84,6 @@ export interface Payment {
   updatedAt: string
 }
 
-// Review Types (matches Review schema)
 export interface Review {
   _id: string
   product: string | Product
@@ -94,7 +94,7 @@ export interface Review {
   updatedAt: string
 }
 
-// Seller Profile Types (matches SellerProfile schema)
+
 export interface SellerProfile {
   _id: string
   user: string | User

@@ -3,7 +3,7 @@
 
 import { Menu } from 'lucide-react'
 import { SellerButton } from './SellButton'
-import { SearchBar } from '../navigation/SearchBar'
+import { SearchBox } from '../search/SearchBox'
 import { NotificationsBell } from '../navigation/NotificationBell'
 import { UserAvatar } from '../navigation/UserAvatar'
 
@@ -21,7 +21,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <SearchBar placeholder="Search fashion items..." className="hidden md:block" />
+        <SearchBox placeholder="Search fashion items..." className="hidden md:block" />
       </div>
       
       <div className="flex items-center space-x-4">

@@ -1,4 +1,6 @@
 // src/components/orders/OrderShipping.tsx
+"use client";
+
 import { Order } from '@/src/types';
 import { MapPin, FileText, CreditCard, Calendar } from 'lucide-react';
 

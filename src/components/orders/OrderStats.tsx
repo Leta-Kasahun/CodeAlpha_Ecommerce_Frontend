@@ -1,4 +1,6 @@
 // src/components/orders/OrderStats.tsx
+"use client";
+
 import { Order } from '@/src/types';
 
 interface OrderStatsProps {

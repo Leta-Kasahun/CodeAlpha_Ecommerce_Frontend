@@ -1,4 +1,6 @@
 // src/components/orders/OrderItems.tsx
+"use client";
+
 import { Order } from '@/src/types';
 import { Package, Plus } from 'lucide-react';
 

@@ -1,6 +1,9 @@
-// src/components/orders/OrderList.tsx
+// src/components/orders/OrderList.tsx - UPDATED
+"use client";
+
 import { Order } from '@/src/types';
 import { OrderCard } from './OrderCard';
+import { Package, ShoppingCart } from 'lucide-react';
 
 interface OrderListProps {
   orders: Order[];
@@ -14,7 +17,7 @@ export const OrderList = ({ orders, loading, onStatusUpdate }: OrderListProps) =
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="animate-pulse space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-4">
+            <div key={i} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
               <div className="h-4 bg-gray-200 rounded w-3/4"></div>
               <div className="h-4 bg-gray-200 rounded w-1/4"></div>
             </div>
@@ -28,12 +31,17 @@ export const OrderList = ({ orders, loading, onStatusUpdate }: OrderListProps) =
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
         <div className="text-gray-400 mb-4">
-          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
+          <Package className="w-16 h-16 mx-auto" />
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
-        <p className="text-gray-500">Your orders will appear here once you make a purchase.</p>
+        <p className="text-gray-500 mb-6">You haven't placed any orders yet.</p>
+        <button
+          onClick={() => window.location.href = '/'}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors"
+        >
+          <ShoppingCart className="w-4 h-4" />
+          Start Shopping
+        </button>
       </div>
     );
   }

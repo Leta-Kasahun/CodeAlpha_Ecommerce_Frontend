@@ -1,4 +1,5 @@
 // src/components/orders/OrderHeader.tsx
+"use client";
 import { Order } from '@/src/types';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { PaymentStatusBadge } from './PaymentStatusBadge';

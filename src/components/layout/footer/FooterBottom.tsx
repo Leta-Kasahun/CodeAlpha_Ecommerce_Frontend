@@ -7,12 +7,12 @@ export function FooterBottom() {
   return (
     <div className="border-t border-gray-800 mt-12 pt-8">
       <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        {/* Copyright */}
+       
         <div className="text-gray-400 text-sm text-center md:text-left">
           © {currentYear} ShopSphere. All rights reserved.
         </div>
         
-        {/* Credits */}
+        
         <div className="text-gray-500 text-sm text-center">
           Built by Leta Kasahun • Powered by Code Alpha Internship
         </div>

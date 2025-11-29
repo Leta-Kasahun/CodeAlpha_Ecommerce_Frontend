@@ -1,6 +1,5 @@
-// Product card component for public products with cart functionality
-// Path: src/components/products/ProductCard.tsx
-
+// File: src/components/products/ProductCard.tsx
+// ProductCard: displays product information with integrated review ratings
 'use client'
 
 import { Package, ShoppingCart } from 'lucide-react'
@@ -8,13 +7,16 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/src/components/ui/card'
 import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
+import { StarRating } from '@/src/components/reviews/StarRating'
 
 interface ProductCardProps {
   product: any
   onAddToCart: (product: any) => void
+  averageRating?: number
+  reviewCount?: number
 }
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart, averageRating, reviewCount }: ProductCardProps) {
   const router = useRouter()
   const { 
     _id, 
@@ -84,6 +86,14 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           {name}
         </h3>
         
+        {/* Review Rating */}
+        {averageRating !== undefined && averageRating > 0 && (
+          <div className="flex items-center gap-2 mb-2">
+            <StarRating rating={averageRating} size={14} readonly />
+            <span className="text-xs text-gray-600">({reviewCount || 0})</span>
+          </div>
+        )}
+        
         {/* Description */}
         {description && (
           <p className="text-xs md:text-sm text-gray-600 mb-3 line-clamp-2 flex-1">
@@ -91,9 +101,15 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           </p>
         )}
         
-        {/* Price */}
+        {/* Price and Add to Cart */}
         <div className="mt-auto flex items-center justify-between">
-          <p className="text-lg md:text-xl font-bold text-[#5156D2]">${price}</p>
+          <div>
+            <p className="text-lg md:text-xl font-bold text-[#5156D2]">${price}</p>
+            {/* Show "No reviews yet" if product has no reviews */}
+            {(!averageRating || averageRating === 0) && (
+              <p className="text-xs text-gray-500 mt-1">No reviews yet</p>
+            )}
+          </div>
           <Button
             onClick={() => onAddToCart(product)}
             disabled={isOutOfStock}

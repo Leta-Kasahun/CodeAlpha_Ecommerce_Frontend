@@ -15,7 +15,7 @@ export function SellerButton() {
       className="px-6 py-3 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow backdrop-blur-sm bg-opacity-80 flex items-center space-x-2"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      onClick={() => router.push('/dashboard/seller/upgrade')}
+      onClick={() => router.push('/dashboard/upgrade')}
     >
       <Store className="h-4 w-4 text-[#5156D2]" />
       <motion.span 

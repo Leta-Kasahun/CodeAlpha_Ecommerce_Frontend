@@ -29,11 +29,11 @@ const nextConfig = {
       },
     ]
   },
-  turbopack: {},
-  experimental: {
-    optimizeCss: true,
-    turbopackFileSystemCacheForDev: true,
-  },
+  // turbopack: {},
+  // experimental: {
+  //   optimizeCss: true,
+  //   turbopackFileSystemCacheForDev: true,
+  // },
 }
 
 export default nextConfig

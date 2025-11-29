@@ -6,10 +6,14 @@ import { useCartStore } from '@/src/stores';
 
 export const OrderSummary = () => {
   const items = useCartStore((s: any) => Array.isArray(s.items) ? s.items : []);
+  
   const subtotal = items.reduce((sum: number, it: any) => {
-    const price = typeof it.product === 'object' ? Number(it.product.price ?? 0) : Number(it.product ?? 0);
+    const price = typeof it.product === 'object' && it.product !== null 
+      ? Number(it.product?.price ?? 0) 
+      : Number(it.product ?? 0);
     return sum + price * Number(it.qty || 0);
   }, 0);
+  
   const shipping = subtotal > 50 ? 0 : items.length ? 9.99 : 0;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
@@ -26,7 +30,7 @@ export const OrderSummary = () => {
           </div>
         ) : (
           items.map((item: any, idx: number) => {
-            const p = typeof item.product === 'object' ? item.product : { name: 'Product', price: 0, images: [] };
+            const p = typeof item.product === 'object' && item.product !== null ? item.product : { name: 'Product', price: 0, images: [] };
             return (
               <div key={idx} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
