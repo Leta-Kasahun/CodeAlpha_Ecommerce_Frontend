@@ -1,42 +1,74 @@
-// File: src/components/seller/SellerOrders.tsx - COMPLETE seller orders management
+// File: src/components/seller/orders/SellerOrders.tsx
 'use client'
 
-import { useOrders } from '@/src/hooks/useOrders'
-import { OrderStats } from '@/src/components/orders/OrderStats'
-import { OrderFilters } from '@/src/components/orders/OrderFilters'
-import { SellerOrderList } from './OrderList'
+import { useSellerOrders } from '@/src/hooks/useSellerOrders'
+import { SellerOrderStats } from './SellerOrderStatus'
+import { SellerOrderFilters } from './SellerOrderFilters'
+import { SellerOrdersTable } from './SellerOrderTable'
 import { useState, useMemo } from 'react'
-import { Package, Download, RefreshCw } from 'lucide-react'
+import { ShoppingCart, RefreshCw, FileText, Receipt } from 'lucide-react'
 
 export function SellerOrders() {
   const {
     orders,
     loading,
     error,
-    filters,
+    pagination,
     updateOrderStatus,
-    refetchOrders,
-    updateFilters
-  } = useOrders()
+    deleteOrder,
+    refetch
+  } = useSellerOrders()
 
   const [refreshing, setRefreshing] = useState(false)
+  const [filters, setFilters] = useState({
+    status: '',
+    page: 1,
+    limit: 10
+  })
 
   const filteredOrders = useMemo(() => {
-    if (!filters.status && !filters.paymentStatus) return orders
-    return orders.filter(order => {
-      const statusMatch = !filters.status || order.orderStatus === filters.status
-      const paymentMatch = !filters.paymentStatus || order.paymentStatus === filters.paymentStatus
-      return statusMatch && paymentMatch
-    })
-  }, [orders, filters])
+    if (!filters.status) return orders
+    return orders.filter(order => order.orderStatus === filters.status)
+  }, [orders, filters.status])
 
   const handleRefresh = async () => {
     setRefreshing(true)
     try {
-      await refetchOrders()
+      await refetch()
     } finally {
       setRefreshing(false)
     }
+  }
+
+  const handleExport = () => {
+    // Export functionality - can be CSV, PDF, etc.
+    const exportData = filteredOrders.map(order => ({
+      'Order ID': order._id,
+      'Product': order.orderItems[0]?.product.name,
+      'Quantity': order.orderItems[0]?.qty,
+      'Price': `$${order.orderItems[0]?.price}`,
+      'Status': order.orderStatus,
+      'Customer': order.user.name,
+      'Email': order.user.email,
+      'Order Date': new Date(order.createdAt).toLocaleDateString()
+    }))
+
+    // Simple CSV export
+    const headers = Object.keys(exportData[0] || {}).join(',')
+    const csvData = exportData.map(row => Object.values(row).join(',')).join('\n')
+    const csvContent = `${headers}\n${csvData}`
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `seller-orders-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  const handleUpdateFilters = (newFilters: Partial<typeof filters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }))
   }
 
   return (
@@ -45,18 +77,22 @@ export function SellerOrders() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="bg-[#5156D2] p-2 rounded-lg">
-            <Package className="w-6 h-6 text-white" />
+            <ShoppingCart className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Order Management</h2>
-            <p className="text-gray-600 text-sm mt-1">Manage and update customer orders</p>
+            <h2 className="text-xl font-bold text-gray-900">Seller Orders</h2>
+            <p className="text-gray-600 text-sm mt-1">Manage orders for your products</p>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <Download className="w-4 h-4" />
-            Export
+          <button 
+            onClick={handleExport}
+            disabled={filteredOrders.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <Receipt className="w-4 h-4" />
+            Export CSV
           </button>
           <button 
             onClick={handleRefresh}
@@ -69,20 +105,23 @@ export function SellerOrders() {
         </div>
       </div>
       
-      {/* Order Statistics */}
-      <OrderStats orders={filteredOrders} />
+      {/* Seller Order Statistics */}
+      <SellerOrderStats orders={filteredOrders} />
 
-      {/* Filters */}
-      <OrderFilters 
+      {/* Seller Filters */}
+      <SellerOrderFilters 
         filters={filters} 
-        onFiltersChange={updateFilters} 
+        onFiltersChange={handleUpdateFilters} 
       />
 
-      {/* Seller Order List WITH status updates */}
-      <SellerOrderList 
+      {/* Orders Table */}
+      <SellerOrdersTable 
         orders={filteredOrders} 
         loading={loading}
         onStatusUpdate={updateOrderStatus}
+        onDeleteOrder={deleteOrder}
+        pagination={pagination}
+        onPageChange={(page) => handleUpdateFilters({ page })}
       />
     </div>
   )

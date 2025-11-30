@@ -5,7 +5,7 @@ class ApiConfig {
   }
 
   private getTimeout(): number {
-    return parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT_MS || '10000');
+    return parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT_MS || '100000');
   }
 
   getHeaders(): HeadersInit {
