@@ -24,9 +24,6 @@ export const OrderHeader = ({ order }: OrderHeaderProps) => {
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-            Order #{order._id.slice(-8).toUpperCase()}
-          </h1>
           <div className="flex items-center text-gray-600 text-sm">
             <Calendar className="w-4 h-4 mr-2" />
             <span>Placed on {formatDate(order.createdAt)}</span>

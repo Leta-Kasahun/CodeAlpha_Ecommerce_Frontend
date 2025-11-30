@@ -1,4 +1,4 @@
-// src/components/orders/OrderList.tsx - UPDATED
+// File: src/components/orders/OrderList.tsx - CLIENT VERSION
 "use client";
 
 import { Order } from '@/src/types';
@@ -8,23 +8,12 @@ import { Package, ShoppingCart } from 'lucide-react';
 interface OrderListProps {
   orders: Order[];
   loading: boolean;
-  onStatusUpdate: (orderId: string, newStatus: string) => Promise<void>;
+  // REMOVED: onStatusUpdate for clients
 }
 
-export const OrderList = ({ orders, loading, onStatusUpdate }: OrderListProps) => {
+export const OrderList = ({ orders, loading }: OrderListProps) => {
   if (loading) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="animate-pulse space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   if (orders.length === 0) {
@@ -52,7 +41,7 @@ export const OrderList = ({ orders, loading, onStatusUpdate }: OrderListProps) =
         <OrderCard
           key={order._id}
           order={order}
-          onStatusUpdate={onStatusUpdate}
+          // REMOVED: onStatusUpdate prop
         />
       ))}
     </div>

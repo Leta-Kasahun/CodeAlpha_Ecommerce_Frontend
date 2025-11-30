@@ -1,8 +1,8 @@
-// src/components/orders/OrderItems.tsx
+// File: src/components/orders/OrderItems.tsx - WITH PRODUCT IMAGES
 "use client";
 
 import { Order } from '@/src/types';
-import { Package, Plus } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 interface OrderItemsProps {
   order: Order;
@@ -16,33 +16,42 @@ export const OrderItems = ({ order }: OrderItemsProps) => {
         <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
       </div>
       
-      <div className="space-y-3">
-        {order.orderItems.map((item, index) => (
-          <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 sm:p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-            {/* Product Image Placeholder */}
-            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Package className="w-6 h-6 text-gray-400" />
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-gray-900 truncate">
-                {typeof item.product === 'string' ? `Product ${item.product.slice(-6)}` : item.product.name}
-              </h3>
-              <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                <span>Qty: {item.qty}</span>
-                <span className="flex items-center">
-                  <Plus className="w-3 h-3 mr-1" />
-                  ${item.price} each
-                </span>
+      <div className="space-y-4">
+        {order.orderItems.map((item, index) => {
+          const product = typeof item.product !== 'string' ? item.product : null;
+          
+          return (
+            <div key={index} className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+              {/* Product Image */}
+              {product?.images?.[0] ? (
+                <img 
+                  src={product.images[0]} 
+                  alt={product.name}
+                  className="w-16 h-16 rounded-lg object-cover border border-gray-200 flex-shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 flex-shrink-0">
+                  <Package className="w-6 h-6 text-gray-400" />
+                </div>
+              )}
+              
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-gray-900 truncate">
+                  {product?.name || `Product ${index + 1}`}
+                </h3>
+                <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                  <span>Qty: {item.qty}</span>
+                  <span>${item.price} each</span>
+                </div>
+              </div>
+              
+              <div className="text-right flex-shrink-0">
+                <p className="font-semibold text-[#5156D2]">${(item.price * item.qty).toFixed(2)}</p>
+                <p className="text-sm text-gray-600">${item.price} × {item.qty}</p>
               </div>
             </div>
-            
-            <div className="text-right flex-shrink-0">
-              <p className="font-semibold text-[#5156D2]">${item.price}</p>
-              <p className="text-sm text-gray-600">${(item.price * item.qty).toFixed(2)} total</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Order Summary */}

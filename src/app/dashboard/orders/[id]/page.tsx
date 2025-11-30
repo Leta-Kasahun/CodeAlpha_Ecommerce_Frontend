@@ -2,11 +2,10 @@
 import { OrderDetails } from '@/src/components/orders/OrderDetails';
 
 interface OrderPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function OrderPage({ params }: OrderPageProps) {
-  return <OrderDetails orderId={params.id} />;
+export default async function OrderPage({ params }: OrderPageProps) {
+  const { id } = await params;
+  return <OrderDetails orderId={id} />;
 }

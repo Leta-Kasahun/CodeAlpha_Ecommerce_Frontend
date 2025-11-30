@@ -1,15 +1,13 @@
-// src/components/dashboard/RecentOrders.tsx
-// Recent orders list showing order status and fashion items
-
+// File: src/components/dashboard/RecentOrders.tsx - WITH PRODUCT IMAGES
 'use client'
 
-import { Clock, CheckCircle, Truck, Package, CreditCard, MapPin } from 'lucide-react'
+import { Clock, CheckCircle, Truck, Calendar, ArrowRight } from 'lucide-react'
+import { Order } from '@/src/types'
+import { OrderStatusBadge } from '../orders/OrderStatusBadge'
 
-const orders = [
-  { id: 'SP123', product: 'Designer Handbag', status: 'processing', date: '2024-01-15', amount: 249, items: 1, payment: 'card' },
-  { id: 'SP122', product: 'Summer Dress', status: 'shipped', date: '2024-01-14', amount: 89, items: 2, payment: 'upi' },
-  { id: 'SP121', product: 'Sneakers', status: 'completed', date: '2024-01-12', amount: 120, items: 1, payment: 'wallet' },
-]
+interface RecentOrdersProps {
+  orders?: Order[]
+}
 
 const statusIcons = {
   processing: Clock,
@@ -17,57 +15,117 @@ const statusIcons = {
   completed: CheckCircle,
 }
 
-const statusColors = {
-  processing: 'text-yellow-600 bg-yellow-50',
-  shipped: 'text-blue-600 bg-blue-50',
-  completed: 'text-green-600 bg-green-50',
-}
+export function RecentOrders({ orders = [] }: RecentOrdersProps) {
+  // Get last 3 orders sorted by date (most recent first)
+  const recentOrders = [...orders]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 3)
 
-const paymentIcons = {
-  card: CreditCard,
-  upi: CreditCard,
-  wallet: CreditCard,
-  cash: CreditCard,
-}
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  }
 
-export function RecentOrders() {
+  if (recentOrders.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+          <p className="text-gray-600 text-sm mt-1">Your latest orders will appear here</p>
+        </div>
+        <div className="p-8 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <Calendar className="h-8 w-8 text-gray-400" />
+          </div>
+          <p className="text-gray-500 text-sm">No orders yet</p>
+          <p className="text-gray-400 text-xs mt-1">Complete your first purchase to see orders here</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-6 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-        <p className="text-gray-600 text-sm mt-1">Your latest fashion purchases</p>
+        <p className="text-gray-600 text-sm mt-1">Your latest purchases</p>
       </div>
+      
       <div className="divide-y divide-gray-200">
-        {orders.map((order) => {
-          const StatusIcon = statusIcons[order.status as keyof typeof statusIcons]
-          const PaymentIcon = paymentIcons[order.payment as keyof typeof paymentIcons]
+        {recentOrders.map((order) => {
+          const StatusIcon = statusIcons[order.orderStatus]
+          const firstItem = order.orderItems[0]
+          const product = typeof firstItem?.product !== 'string' ? firstItem?.product : null
+          
           return (
-            <div key={order.id} className="p-6 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className={`p-2 rounded-lg ${statusColors[order.status as keyof typeof statusColors]}`}>
-                  <StatusIcon className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">{order.product}</p>
-                  <div className="flex items-center space-x-4 mt-1">
-                    <p className="text-sm text-gray-500">#{order.id}</p>
-                    <div className="flex items-center space-x-1">
-                      <Package className="h-3 w-3 text-gray-400" />
-                      <span className="text-sm text-gray-500">{order.items} item{order.items > 1 ? 's' : ''}</span>
+            <div key={order._id} className="p-6 hover:bg-gray-50 transition-colors">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-4 flex-1">
+                  {/* Product Image */}
+                  <div className="flex-shrink-0">
+                    {product?.images?.[0] ? (
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.name}
+                        className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                        <div className="text-gray-400 text-xs text-center px-2">
+                          No Image
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Order Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <OrderStatusBadge status={order.orderStatus} />
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Calendar className="h-3 w-3" />
+                        <span>{formatDate(order.createdAt)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <PaymentIcon className="h-3 w-3 text-gray-400" />
-                      <span className="text-sm text-gray-500 capitalize">{order.payment}</span>
+                    
+                    {/* Product Name and Price */}
+                    {product && (
+                      <div className="mb-2">
+                        <h3 className="font-medium text-gray-900 text-sm line-clamp-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          ${firstItem.price} × {firstItem.qty}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Additional Items Count */}
+                    {order.orderItems.length > 1 && (
+                      <p className="text-xs text-gray-500">
+                        +{order.orderItems.length - 1} more item{order.orderItems.length - 1 > 1 ? 's' : ''}
+                      </p>
+                    )}
+
+                    {/* Order Total */}
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-lg font-semibold text-[#5156D2]">
+                        ${order.totalPrice}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold text-gray-900">${order.amount}</p>
-                <p className="text-sm text-gray-500 capitalize flex items-center justify-end">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  {order.status}
-                </p>
+
+                {/* View Details Arrow */}
+                <button 
+                  onClick={() => window.open(`/dashboard/orders/${order._id}`, '_blank')}
+                  className="flex-shrink-0 ml-4 p-2 text-gray-400 hover:text-[#5156D2] transition-colors"
+                >
+                  <ArrowRight className="h-5 w-5" />
+                </button>
               </div>
             </div>
           )

@@ -1,5 +1,5 @@
-import { SellerProfileSettings } from '@/src/components/seller/SellerProfileSettings'
+// // im 
 
-export default function SellerSettingsPage() {
-  return <SellerProfileSettings />
-}
+// export default function SellerSettingsPage() {
+//   return <SellerProfileSettings />
+// }

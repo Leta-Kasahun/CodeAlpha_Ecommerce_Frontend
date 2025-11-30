@@ -1,4 +1,4 @@
-// File: src/components/checkout/CheckoutForm.tsx
+// CheckoutForm: Fixed layout with equal heights, proper spacing, and correct step positioning
 'use client'
 
 import { useState } from 'react'
@@ -45,29 +45,26 @@ export const CheckoutForm = () => {
         paymentMethod: formData.paymentMethod
       })
       
-if (order && order._id) {
-      // Wait for state to update before proceeding
-      await new Promise(resolve => {
+      if (order && order._id) {
         setCreatedOrder(order)
-        setTimeout(resolve, 100) // Small delay to ensure state update
-      })
-      setStep(4)
-      return order
-    } else {
-      setPaymentError('Failed to create order - please try again')
+        setTimeout(() => setStep(4), 0)
+        return order
+      } else {
+        setPaymentError('Failed to create order - please try again')
+        return null
+      }
+    } catch (err: any) {
+      console.error('Order creation error:', err)
+      setPaymentError('Failed to create order: ' + (err.message || 'Unknown error'))
       return null
+    } finally {
+      setSubmitting(false)
     }
-  } catch (err: any) {
-    console.error('Order creation error:', err)
-    setPaymentError('Failed to create order: ' + (err.message || 'Unknown error'))
-    return null
-  } finally {
-    setSubmitting(false)
   }
-}
+
   const handlePaymentVerification = async (enteredAmount: number) => {
-    if (!createdOrder) {
-      setPaymentError('No order found. Please create order first.')
+    if (!createdOrder || !createdOrder._id) {
+      setPaymentError('Order not found. Please try creating the order again.')
       return false
     }
 
@@ -80,9 +77,6 @@ if (order && order._id) {
     setPaymentError('')
     
     try {
-      console.log('Creating payment for order:', createdOrder._id, 'amount:', enteredAmount, 'method:', formData.paymentMethod)
-      
-      // Ensure payment method is defined and valid
       const paymentMethod = formData.paymentMethod || 'card'
       
       const payment = await createPayment({
@@ -91,33 +85,25 @@ if (order && order._id) {
         method: paymentMethod
       })
 
-      console.log('Payment creation response:', payment)
-
       if (!payment) {
         setPaymentError('Failed to create payment record')
         return false
       }
-
-      console.log('Processing payment:', payment._id)
       
-      const processed = await processPayment(payment._id,'success');
-
-      console.log('Payment processing response:', processed)
+      const processed = await processPayment(payment._id, 'success')
 
       if (!processed) {
         setPaymentError('Payment processing failed. Please try again.')
         return false
       }
 
-      // Clear cart after successful payment
       try {
         await loadCart()
       } catch (cartError) {
         console.warn('Cart clear warning:', cartError)
       }
 
-      console.log('Payment successful, navigating to order details')
-      router.push(`/dashboard/orders/${createdOrder._id}`)
+      router.push('/dashboard/orders')
       return true
       
     } catch (err: any) {
@@ -157,37 +143,40 @@ if (order && order._id) {
   const isLoading = creatingOrder || processingPayment || submitting
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-              <div className="flex items-center justify-between max-w-md mx-auto">
-                {['Shipping', 'Payment', 'Review', 'Pay'].map((stepName, index) => (
-                  <div key={stepName} className="flex items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                      step > index + 1 ? 'bg-[#5156D2] text-white' : 
-                      step === index + 1 ? 'bg-[#E6B84A] text-white' : 
-                      'bg-gray-200 text-gray-600'
-                    }`}>
-                      {step > index + 1 ? '✓' : index + 1}
-                    </div>
-                    <span className={`hidden sm:block ml-2 text-sm ${
-                      step >= index + 1 ? 'text-gray-900 font-medium' : 'text-gray-500'
-                    }`}>
-                      {stepName}
-                    </span>
-                    {index < 3 && (
-                      <div className={`hidden sm:block w-8 sm:w-12 h-0.5 mx-2 sm:mx-4 ${
-                        step > index + 1 ? 'bg-[#5156D2]' : 'bg-gray-200'
-                      }`} />
-                    )}
-                  </div>
-                ))}
+        {/* Progress Steps - Fixed at top */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex items-center justify-center max-w-2xl mx-auto">
+            {['Shipping', 'Payment', 'Review', 'Pay'].map((stepName, index) => (
+              <div key={stepName} className="flex items-center flex-1 justify-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium border-2 ${
+                  step > index + 1 ? 'bg-[#5156D2] border-[#5156D2] text-white' : 
+                  step === index + 1 ? 'border-[#E6B84A] bg-[#E6B84A] text-white' : 
+                  'border-gray-300 bg-white text-gray-400'
+                }`}>
+                  {step > index + 1 ? '✓' : index + 1}
+                </div>
+                <span className={`ml-3 text-sm font-medium ${
+                  step >= index + 1 ? 'text-gray-900' : 'text-gray-500'
+                }`}>
+                  {stepName}
+                </span>
+                {index < 3 && (
+                  <div className={`hidden sm:block w-16 h-0.5 mx-6 ${
+                    step > index + 1 ? 'bg-[#5156D2]' : 'bg-gray-200'
+                  }`} />
+                )}
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 min-h-[500px] md:min-h-[600px] flex flex-col">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Left Column - Forms */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 min-h-[600px]">
               {step === 1 && (
                 <ShippingAddressForm
                   data={formData.shippingAddress}
@@ -197,19 +186,17 @@ if (order && order._id) {
               )}
 
               {step === 2 && (
-                <div className="flex-1 flex flex-col">
-                  <PaymentMethodSelect
-                    value={formData.paymentMethod}
-                    onChange={(method) => updateFormData('paymentMethod', method)}
-                    onBack={() => setStep(1)}
-                    onNext={() => setStep(3)}
-                  />
-                </div>
+                <PaymentMethodSelect
+                  value={formData.paymentMethod}
+                  onChange={(method) => updateFormData('paymentMethod', method)}
+                  onBack={() => setStep(1)}
+                  onNext={() => setStep(3)}
+                />
               )}
 
               {step === 3 && (
-                <div className="flex-1 flex flex-col justify-between">
-                  <div className="space-y-4">
+                <div className="h-full flex flex-col">
+                  <div className="space-y-6 flex-1">
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                       <div className="flex items-center">
                         <div className="bg-green-100 p-2 rounded-full">
@@ -224,16 +211,16 @@ if (order && order._id) {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">Shipping Address</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <h4 className="font-medium text-gray-900 mb-3">Shipping Address</h4>
                         <p className="text-sm text-gray-600">
                           {formData.shippingAddress.city}, {formData.shippingAddress.postalCode}, {formData.shippingAddress.country}
                         </p>
                       </div>
 
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">Payment Method</h4>
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <h4 className="font-medium text-gray-900 mb-3">Payment Method</h4>
                         <p className="text-sm text-gray-600 capitalize">{formData.paymentMethod}</p>
                       </div>
                     </div>
@@ -245,11 +232,11 @@ if (order && order._id) {
                     )}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-6 mt-6 border-t border-gray-200">
+                  <div className="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-gray-200">
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors order-2 sm:order-1"
+                      className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors order-2 sm:order-1"
                     >
                       Back
                     </button>
@@ -257,7 +244,7 @@ if (order && order._id) {
                       type="button"
                       onClick={handleCreateOrder}
                       disabled={isLoading}
-                      className="flex-1 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+                      className="flex-1 px-8 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
                     >
                       {isLoading ? 'Creating Order...' : 'Create Order & Proceed to Payment'}
                     </button>
@@ -276,9 +263,10 @@ if (order && order._id) {
             </div>
           </div>
 
+          {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-6 h-full">
-              <div className="h-full flex flex-col">
+            <div className="sticky top-8">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 min-h-[600px]">
                 <OrderSummary />
               </div>
             </div>

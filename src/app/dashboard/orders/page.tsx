@@ -1,11 +1,6 @@
-// src/app/dashboard/orders/[id]/page.tsx
-import { OrderDetails } from '@/src/components/orders/OrderDetails';
+// File: src/app/dashboard/orders/page.tsx
+import { OrderDashboard } from '@/src/components/orders/OrderDashboard';
 
-interface OrderPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function OrderPage({ params }: OrderPageProps) {
-  const { id } = await params;
-  return <OrderDetails orderId={id} />;
+export default function OrdersPage() {
+  return <OrderDashboard />;
 }
