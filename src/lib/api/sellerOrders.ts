@@ -1,9 +1,11 @@
+// File: src/lib/api/sellerOrders.ts
 import { apiConfig } from './config';
 import { 
   SellerOrdersResponse, 
   UpdateOrderStatusResponse, 
   DeleteOrderResponse,
-  SellerOrderFilters 
+  SellerOrderFilters,
+  SellerOrder 
 } from '@/src/types/seller';
 
 export const sellerOrdersAPI = {
@@ -22,6 +24,10 @@ export const sellerOrdersAPI = {
     const url = `/api/seller/orders${queryString ? `?${queryString}` : ''}`;
     
     return apiConfig.authRequest(url, token);
+  },
+
+  getSellerOrder: async (orderId: string, token: string): Promise<{ success: boolean; order?: SellerOrder; message?: string }> => {
+    return apiConfig.authRequest(`/api/seller/orders/${orderId}`, token);
   },
 
   updateOrderStatus: async (orderId: string, status: string, token: string): Promise<UpdateOrderStatusResponse> => {
