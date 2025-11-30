@@ -1,114 +1,82 @@
-// useOrders: fetch and manage orders. Handles backend envelope and protects against undefined payloads.
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { ordersAPI } from '@/src/lib/api/orders';
-import { Order } from '@/src/types';
-import { useAuthStore } from '@/src/stores';
-
-interface UseOrdersReturn {
-  orders: Order[];
-  loading: boolean;
-  error: string | null;
-  filters: OrderFilters;
-  updateOrderStatus: (orderId: string, newStatus: string) => Promise<void>;
-  refetchOrders: () => Promise<void>;
-  updateFilters: (newFilters: Partial<OrderFilters>) => void;
-}
+import { useState, useEffect, useCallback } from 'react'
+import { ordersAPI } from '@/src/lib/api/orders'
+import { Order } from '@/src/types'
+import { useAuthStore } from '@/src/stores'
 
 interface OrderFilters {
-  status: string;
-  paymentStatus: string;
+  status: string
+  paymentStatus: string
 }
 
-export const useOrders = (): UseOrdersReturn => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useOrders = () => {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<OrderFilters>({
     status: '',
-    paymentStatus: '',
-  });
+    paymentStatus: ''
+  })
   
-  const router = useRouter();
-  const { token, isAuthenticated, logout } = useAuthStore();
+  const { token, isAuthenticated } = useAuthStore()
 
-  const handleAuthError = () => {
-    logout();
-    router.push('/login');
-  };
+  const fetchOrders = useCallback(async () => {
+    if (!isAuthenticated || !token) {
+      setError('Authentication required')
+      return
+    }
 
-  const fetchOrders = async () => {
+    setLoading(true)
+    setError(null)
+    
     try {
-      setLoading(true);
-      setError(null);
+      const response = await ordersAPI.getOrders(token)
       
-      if (!isAuthenticated || !token) {
-        handleAuthError();
-        return;
-      }
-
-      const response = await ordersAPI.getOrders(token);
-      
-      if (response && response.success) {
-        setOrders(response.orders ?? []);
+      if (response.success) {
+        setOrders(response.orders || [])
       } else {
-        setOrders([]);
+        setError(response.message || 'Failed to fetch orders')
       }
     } catch (err: any) {
-      if (err.message?.includes('Invalid token') || err.message?.includes('Authentication')) {
-        handleAuthError();
-      } else {
-        setError('Failed to fetch orders');
-        console.error('Error fetching orders:', err);
-      }
+      setError(err.message || 'Network error while fetching orders')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }, [isAuthenticated, token])
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderStatus = useCallback(async (orderId: string, newStatus: string) => {
+    if (!isAuthenticated || !token) {
+      throw new Error('Authentication required')
+    }
+
     try {
-      if (!isAuthenticated || !token) {
-        handleAuthError();
-        return;
-      }
-
-      const response = await ordersAPI.updateOrderStatus(orderId, newStatus, token);
+      const response = await ordersAPI.updateOrderStatus(orderId, newStatus, token)
       
-      if (response && response.success) {
-        // If backend returns updated order object, use it. Otherwise do a safe local update.
-        if ((response as any).order) {
-          const updatedOrder = (response as any).order as Order;
-          setOrders(prev => prev.map(o => (o._id === orderId ? updatedOrder : o)));
+      if (response.success) {
+        if (response.order) {
+          setOrders(prev => prev.map(o => o._id === orderId ? response.order! : o))
         } else {
           setOrders(prev => prev.map(order => 
-            order._id === orderId ? { ...order, orderStatus: newStatus } : order
-          ));
+            order._id === orderId ? { 
+              ...order, 
+              orderStatus: newStatus as 'processing' | 'shipped' | 'completed' 
+            } : order
+          ))
         }
       }
     } catch (err: any) {
-      if (err.message?.includes('Invalid token') || err.message?.includes('Authentication')) {
-        handleAuthError();
-      } else {
-        console.error('Error updating order status:', err);
-        throw err;
-      }
+      throw new Error(err.message || 'Failed to update order status')
     }
-  };
+  }, [isAuthenticated, token])
 
-  const updateFilters = (newFilters: Partial<OrderFilters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-  };
+  const updateFilters = useCallback((newFilters: Partial<OrderFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }))
+  }, [])
 
   useEffect(() => {
-    if (isAuthenticated && token) {
-      fetchOrders();
-    } else {
-      handleAuthError();
-    }
-  }, [isAuthenticated, token]);
+    fetchOrders()
+  }, [fetchOrders])
 
   return {
     orders,
@@ -117,6 +85,6 @@ export const useOrders = (): UseOrdersReturn => {
     filters,
     updateOrderStatus,
     refetchOrders: fetchOrders,
-    updateFilters,
-  };
-};
+    updateFilters
+  }
+}

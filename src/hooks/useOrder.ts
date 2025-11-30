@@ -1,72 +1,69 @@
-// src/components/hooks/useOrder.ts - INDIVIDUAL ORDER HOOK (keep this name)
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback } from 'react';
-import { ordersAPI } from '@/src/lib/api/orders';
-import { Order } from '@/src/types';
-import { useAuthStore } from '@/src/stores';
+import { useState, useEffect, useCallback } from 'react'
+import { ordersAPI } from '@/src/lib/api/orders'
+import { Order } from '@/src/types'
+import { useAuthStore } from '@/src/stores'
 
 export const useOrder = (orderId: string | undefined) => {
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState<boolean>(Boolean(orderId));
-  const [error, setError] = useState<string | null>(null);
-
-  const { token, isAuthenticated, logout } = useAuthStore();
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState<boolean>(Boolean(orderId))
+  const [error, setError] = useState<string | null>(null)
+  const { token, isAuthenticated } = useAuthStore()
 
   const fetchOrder = useCallback(async () => {
-    if (!orderId) return;
-    if (!isAuthenticated || !token) {
-      setError('Not authenticated');
-      return;
-    }
+    if (!orderId || !isAuthenticated || !token) return
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
+    
     try {
-      const res = await ordersAPI.getOrder(orderId, token);
-      if (res && res.success && res.order) {
-        setOrder(res.order);
+      const response = await ordersAPI.getOrder(orderId, token)
+      
+      if (response.success && response.order) {
+        setOrder(response.order)
       } else {
-        setOrder(null);
-        setError(res?.message || 'Order not found');
+        setError(response.message || 'Order not found')
+        setOrder(null)
       }
     } catch (err: any) {
-      setError(err?.message || 'Failed to load order');
-      setOrder(null);
+      setError(err.message || 'Failed to load order')
+      setOrder(null)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [orderId, isAuthenticated, token]);
+  }, [orderId, isAuthenticated, token])
 
   useEffect(() => {
-    if (orderId && isAuthenticated && token) {
-      fetchOrder();
-    }
-  }, [orderId, isAuthenticated, token, fetchOrder]);
+    fetchOrder()
+  }, [fetchOrder])
 
-  const refetchOrder = useCallback(async () => {
-    await fetchOrder();
-  }, [fetchOrder]);
+  const refetchOrder = useCallback(() => {
+    fetchOrder()
+  }, [fetchOrder])
 
   const updateOrderStatus = useCallback(async (newStatus: string) => {
-    if (!orderId) throw new Error('Order id missing');
-    if (!isAuthenticated || !token) {
-      throw new Error('Not authenticated');
+    if (!orderId || !isAuthenticated || !token) {
+      throw new Error('Authentication required')
     }
 
     try {
-      const res = await ordersAPI.updateOrderStatus(orderId, newStatus, token);
-      if (res && res.success && (res as any).order) {
-        setOrder((res as any).order as Order);
+      const response = await ordersAPI.updateOrderStatus(orderId, newStatus, token)
+      
+      if (response.success && response.order) {
+        setOrder(response.order)
+        return true
       } else {
-        // fallback: optimistic update
-        setOrder(prev => prev ? { ...prev, orderStatus: newStatus } : prev);
+        setOrder(prev => prev ? { 
+          ...prev, 
+          orderStatus: newStatus as 'processing' | 'shipped' | 'completed' 
+        } : prev)
+        return true
       }
-      return true;
-    } catch (err) {
-      throw err;
+    } catch (err: any) {
+      throw new Error(err.message || 'Failed to update order status')
     }
-  }, [orderId, isAuthenticated, token]);
+  }, [orderId, isAuthenticated, token])
 
   return {
     order,
@@ -74,5 +71,5 @@ export const useOrder = (orderId: string | undefined) => {
     error,
     updateOrderStatus,
     refetchOrder
-  };
-};
+  }
+}

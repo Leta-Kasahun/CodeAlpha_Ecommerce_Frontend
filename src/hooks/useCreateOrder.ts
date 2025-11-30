@@ -1,4 +1,3 @@
-// useCreateOrder: hook to create an order. Expects ordersAPI.createOrder to return the backend envelope.
 'use client'
 
 import { useState, useCallback } from 'react'
@@ -11,7 +10,7 @@ interface CreateOrderData {
     postalCode: string  
     country: string
   }
-  paymentMethod: string
+  paymentMethod: 'card' | 'upi' | 'wallet' | 'cash'
 }
 
 export const useCreateOrder = () => {

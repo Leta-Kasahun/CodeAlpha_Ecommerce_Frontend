@@ -1,3 +1,4 @@
+// File: src/components/checkout/CheckoutForm.tsx
 'use client'
 
 import { useState } from 'react'
@@ -8,6 +9,7 @@ import { useCart } from '@/src/hooks/useCart'
 import { ShippingAddressForm } from './ShippingAddressForm'
 import { PaymentMethodSelect } from './PaymentMethodSelect'
 import { OrderSummary } from './OrderSummary'
+import { PaymentVerification } from './PaymentVerfication'
 import { useAuthStore } from '@/src/stores'
 
 export const CheckoutForm = () => {
@@ -18,90 +20,110 @@ export const CheckoutForm = () => {
     shippingAddress: { city: '', postalCode: '', country: '' },
     paymentMethod: 'card' as 'card' | 'upi' | 'wallet' | 'cash',
   })
+  const [createdOrder, setCreatedOrder] = useState<any>(null)
+  const [paymentError, setPaymentError] = useState<string>('')
 
   const { createOrder, loading: creatingOrder, error: orderError } = useCreateOrder()
-  const { createPayment, processPayment, loading: processingPayment, error: paymentError } = usePayments()
+  const { createPayment, processPayment, loading: processingPayment, error: paymentErrorFromHook } = usePayments()
   const { loadCart } = useCart()
 
   const [submitting, setSubmitting] = useState(false)
-  const error = orderError || paymentError
+  const error = orderError || paymentError || paymentErrorFromHook
 
   const updateFormData = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!isAuthenticated) {
-      return
-    }
+  const handleCreateOrder = async () => {
+    if (!isAuthenticated) return null
 
     setSubmitting(true)
+    setPaymentError('')
     try {
-      console.log('Step 1: Creating order with data:', formData)
-      
-      // 1) Create order (backend will NOT clear cart at this point)
       const order = await createOrder({
         shippingAddress: formData.shippingAddress,
         paymentMethod: formData.paymentMethod
       })
       
-      console.log('Order creation response:', order)
-      
-      // FIX: Check if order is null/undefined before accessing _id
-      if (!order) {
-        throw new Error(orderError || 'Could not create order - no order returned')
-      }
+if (order && order._id) {
+      // Wait for state to update before proceeding
+      await new Promise(resolve => {
+        setCreatedOrder(order)
+        setTimeout(resolve, 100) // Small delay to ensure state update
+      })
+      setStep(4)
+      return order
+    } else {
+      setPaymentError('Failed to create order - please try again')
+      return null
+    }
+  } catch (err: any) {
+    console.error('Order creation error:', err)
+    setPaymentError('Failed to create order: ' + (err.message || 'Unknown error'))
+    return null
+  } finally {
+    setSubmitting(false)
+  }
+}
+  const handlePaymentVerification = async (enteredAmount: number) => {
+    if (!createdOrder) {
+      setPaymentError('No order found. Please create order first.')
+      return false
+    }
 
-      // FIX: Check if order has _id property
-      if (!order._id) {
-        console.error('Order created but missing _id:', order)
-        throw new Error('Order created but missing order ID')
-      }
+    if (enteredAmount !== createdOrder.totalPrice) {
+      setPaymentError(`Amount must be exactly $${createdOrder.totalPrice}`)
+      return false
+    }
 
-      console.log('Step 2: Creating payment for order:', order._id)
+    setSubmitting(true)
+    setPaymentError('')
+    
+    try {
+      console.log('Creating payment for order:', createdOrder._id, 'amount:', enteredAmount, 'method:', formData.paymentMethod)
       
-      // 2) Create payment record for the order (status: pending)
+      // Ensure payment method is defined and valid
+      const paymentMethod = formData.paymentMethod || 'card'
+      
       const payment = await createPayment({
-        order: order._id,
-        amount: order.totalPrice, // Use order total from backend
-        method: formData.paymentMethod
+        order: createdOrder._id,
+        amount: enteredAmount,
+        method: paymentMethod
       })
 
       console.log('Payment creation response:', payment)
 
-      if (!payment || !payment._id) {
-        throw new Error('Could not initiate payment')
+      if (!payment) {
+        setPaymentError('Failed to create payment record')
+        return false
       }
 
-      console.log('Step 3: Processing payment')
+      console.log('Processing payment:', payment._id)
       
-      // 3) Process payment - backend will clear cart ONLY on success
-      const processed = await processPayment(payment._id, { status: 'success' }, async () => {
-        // onSuccess callback: refresh client cart state after successful payment
-        console.log('Payment successful, refreshing cart...')
-        try {
-          await loadCart()
-        } catch (e) {
-          console.warn('Cart refresh failed:', e)
-        }
-      })
+      const processed = await processPayment(payment._id,'success');
 
       console.log('Payment processing response:', processed)
 
-      if (!processed || processed.status !== 'success') {
-        throw new Error('Payment failed. Your cart was not cleared.')
+      if (!processed) {
+        setPaymentError('Payment processing failed. Please try again.')
+        return false
       }
 
-      console.log('Step 4: Navigation to order details')
-      
-      // 4) Navigate to order details / confirmation
-      router.push(`/dashboard/orders/${order._id}`)
+      // Clear cart after successful payment
+      try {
+        await loadCart()
+      } catch (cartError) {
+        console.warn('Cart clear warning:', cartError)
+      }
+
+      console.log('Payment successful, navigating to order details')
+      router.push(`/dashboard/orders/${createdOrder._id}`)
+      return true
       
     } catch (err: any) {
-      console.error('Checkout error:', err)
-      // Error is already set by the hooks
+      console.error('Payment error:', err)
+      setPaymentError(err.message || 'Payment failed. Please try again.')
+      return false
     } finally {
       setSubmitting(false)
     }
@@ -137,13 +159,11 @@ export const CheckoutForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Main Content - Responsive */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {/* Progress Steps - Mobile Responsive */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
               <div className="flex items-center justify-between max-w-md mx-auto">
-                {['Shipping', 'Payment', 'Review'].map((stepName, index) => (
+                {['Shipping', 'Payment', 'Review', 'Pay'].map((stepName, index) => (
                   <div key={stepName} className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                       step > index + 1 ? 'bg-[#5156D2] text-white' : 
@@ -157,7 +177,7 @@ export const CheckoutForm = () => {
                     }`}>
                       {stepName}
                     </span>
-                    {index < 2 && (
+                    {index < 3 && (
                       <div className={`hidden sm:block w-8 sm:w-12 h-0.5 mx-2 sm:mx-4 ${
                         step > index + 1 ? 'bg-[#5156D2]' : 'bg-gray-200'
                       }`} />
@@ -167,25 +187,15 @@ export const CheckoutForm = () => {
               </div>
             </div>
 
-            {/* Step Content - Increased height with min-height */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 min-h-[500px] md:min-h-[600px] flex flex-col">
-              {/* Step 1: Shipping Address */}
               {step === 1 && (
                 <ShippingAddressForm
                   data={formData.shippingAddress}
                   onChange={(data) => updateFormData('shippingAddress', data)}
-                  onNext={() => {
-                    // Validate required fields before proceeding
-                    if (formData.shippingAddress.city && 
-                        formData.shippingAddress.postalCode && 
-                        formData.shippingAddress.country) {
-                      setStep(2)
-                    }
-                  }}
+                  onNext={() => setStep(2)}
                 />
               )}
 
-              {/* Step 2: Payment Method - Increased height */}
               {step === 2 && (
                 <div className="flex-1 flex flex-col">
                   <PaymentMethodSelect
@@ -197,7 +207,6 @@ export const CheckoutForm = () => {
                 </div>
               )}
 
-              {/* Step 3: Review and Submit */}
               {step === 3 && (
                 <div className="flex-1 flex flex-col justify-between">
                   <div className="space-y-4">
@@ -215,7 +224,6 @@ export const CheckoutForm = () => {
                       </div>
                     </div>
 
-                    {/* Review Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-gray-50 rounded-lg p-4">
                         <h4 className="font-medium text-gray-900 mb-2">Shipping Address</h4>
@@ -242,24 +250,32 @@ export const CheckoutForm = () => {
                       type="button"
                       onClick={() => setStep(2)}
                       className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors order-2 sm:order-1"
-                      disabled={isLoading}
                     >
                       Back
                     </button>
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={handleCreateOrder}
                       disabled={isLoading}
                       className="flex-1 px-6 py-3 bg-[#5156D2] text-white rounded-lg hover:bg-[#4347c4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
                     >
-                      {isLoading ? 'Processing...' : 'Place Order & Pay'}
+                      {isLoading ? 'Creating Order...' : 'Create Order & Proceed to Payment'}
                     </button>
                   </div>
                 </div>
               )}
+
+              {step === 4 && createdOrder && (
+                <PaymentVerification
+                  order={createdOrder}
+                  onPaymentComplete={handlePaymentVerification}
+                  loading={isLoading}
+                  error={paymentError}
+                />
+              )}
             </div>
           </div>
 
-          {/* Order Summary Sidebar - Responsive with equal height */}
           <div className="lg:col-span-1">
             <div className="sticky top-6 h-full">
               <div className="h-full flex flex-col">
@@ -267,7 +283,7 @@ export const CheckoutForm = () => {
               </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )
