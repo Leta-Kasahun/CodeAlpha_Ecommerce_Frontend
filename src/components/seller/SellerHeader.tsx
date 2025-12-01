@@ -1,11 +1,10 @@
-// src/components/seller/SellerHeader.tsx
+// File: src/components/seller/SellerHeader.tsx
 'use client'
 
-import { useState } from 'react'
 import { Menu } from 'lucide-react'
-import { SearchBar } from '../navigation/SearchBar'
 import { NotificationsBell } from '../navigation/NotificationBell'
 import { UserAvatar } from '../navigation/UserAvatar'
+import { SearchBox } from '../search/SearchBox'
 import { CategoryFilter } from '../navigation/CategoryFilter'
 
 interface SellerHeaderProps {
@@ -13,12 +12,6 @@ interface SellerHeaderProps {
 }
 
 export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
-  const [selectedCategory, setSelectedCategory] = useState('all')
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category)
-  }
-
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="flex items-center justify-between w-full px-6 py-4">
@@ -30,12 +23,16 @@ export function SellerHeader({ onToggleSidebar }: SellerHeaderProps) {
             <Menu className="h-5 w-5" />
           </button>
           
-          <CategoryFilter 
-            onCategoryChange={handleCategoryChange}
-            selectedCategory={selectedCategory}
-          />
-
-          <SearchBar placeholder="Search products or orders..." className="hidden lg:block" />
+          {/* Category Filter */}
+           <CategoryFilter/>
+          
+          {/* Search Box */}
+          <div className="hidden lg:flex items-center w-64">
+            <SearchBox 
+              placeholder="Search products or orders..."
+              className="w-full"
+            />
+          </div>
         </div>
         
         <div className="flex items-center space-x-4">

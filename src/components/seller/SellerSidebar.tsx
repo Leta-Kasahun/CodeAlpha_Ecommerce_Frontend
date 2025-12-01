@@ -1,8 +1,10 @@
-// File: src/components/seller/SellerSidebar.tsx - SAME SPACING & FONT AS CLIENT
+// File: src/components/seller/SellerSidebar.tsx
 'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSellerProducts } from '@/src/hooks/useSellerProducts'
+import { useSellerOrders } from '@/src/hooks/useSellerOrders'
 import { 
   LayoutDashboard, 
   Package, 
@@ -28,6 +30,17 @@ const navigation = [
 
 export function SellerSidebar({ open, onClose }: SellerSidebarProps) {
   const pathname = usePathname()
+  const { products } = useSellerProducts()
+  const { orders } = useSellerOrders()
+
+  // Calculate real stats
+  const activeProducts = products.filter(p => p.isAvailable !== false).length
+  const pendingOrders = orders.filter(o => o.orderStatus === 'processing').length
+  const totalRevenue = orders.reduce((sum, order) => {
+    return sum + order.orderItems.reduce((orderSum, item) => 
+      orderSum + (item.price * item.qty), 0
+    )
+  }, 0)
 
   return (
     <>
@@ -44,7 +57,7 @@ export function SellerSidebar({ open, onClose }: SellerSidebarProps) {
         lg:translate-x-0 lg:static lg:inset-0 flex flex-col
         ${open ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        {/* Header - Same spacing */}
+        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-[#5156D2] rounded-lg">
@@ -60,7 +73,7 @@ export function SellerSidebar({ open, onClose }: SellerSidebarProps) {
           </button>
         </div>
         
-        {/* Navigation - SAME SPACING & FONT as client */}
+        {/* Navigation */}
         <nav className="flex-1 px-4 py-8 space-y-3">
           {navigation.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -90,20 +103,23 @@ export function SellerSidebar({ open, onClose }: SellerSidebarProps) {
           })}
         </nav>
 
-        {/* Quick Stats - SAME SPACING as client */}
+        {/* Store Stats with Real Data */}
         <div className="p-6 border-t border-gray-200">
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="text-sm font-medium text-gray-900 mb-3">Store Overview</p>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Active Products</span>
-                <span className="font-medium text-[#5156D2]">24</span>
+                <span className="font-medium text-[#5156D2]">{activeProducts}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Pending Orders</span>
-                <span className="font-medium text-[#E6B84A]">8</span>
+                <span className="font-medium text-[#E6B84A]">{pendingOrders}</span>
               </div>
-             
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Revenue</span>
+                <span className="font-medium text-gray-900">${totalRevenue.toFixed(2)}</span>
+              </div>
             </div>
           </div>
         </div>

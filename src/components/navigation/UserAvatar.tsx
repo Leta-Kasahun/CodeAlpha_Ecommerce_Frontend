@@ -1,6 +1,5 @@
 // File: src/components/navigation/UserAvatar.tsx - MINIMAL & CLEAN
 'use client'
-
 import { useState, useRef, useEffect } from 'react'
 import { User, LogOut, ChevronDown, Mail, Settings } from 'lucide-react'
 import { useAuthStore } from '@/src/stores'

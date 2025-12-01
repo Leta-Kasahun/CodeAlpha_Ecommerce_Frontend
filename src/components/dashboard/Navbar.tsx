@@ -27,7 +27,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
       <div className="flex items-center space-x-4">
         <SellerButton />
         <NotificationsBell count={3} />
-        <UserAvatar showName={true} />
+        <UserAvatar/>
       </div>
     </div>
   )

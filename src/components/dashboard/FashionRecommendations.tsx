@@ -21,11 +21,9 @@ export function FashionRecommendations() {
         const response = await productsAPI.getProducts()
         const allProducts = response.products || response || []
         
-        // Get ratings for all products
         const productIds = allProducts.map((p: any) => p._id)
         const ratings = await getProductsRatings(productIds)
         
-        // Filter products with rating >= 4 and sort by highest rating
         const highRatedProducts = allProducts
           .map((product: any) => ({
             ...product,
@@ -34,7 +32,7 @@ export function FashionRecommendations() {
           }))
           .filter(product => product.averageRating >= 4)
           .sort((a, b) => b.averageRating - a.averageRating)
-          .slice(0, 4) // Top 4 highest rated products
+          .slice(0, 4)
 
         setRecommendedProducts(highRatedProducts)
       } catch (error) {
@@ -74,7 +72,6 @@ export function FashionRecommendations() {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200/60 shadow-sm">
-      {/* Header */}
       <div className="p-6 border-b border-gray-200/60">
         <div className="flex items-center justify-between">
           <div>
@@ -92,7 +89,6 @@ export function FashionRecommendations() {
         </div>
       </div>
 
-      {/* Products Grid */}
       <div className="p-6">
         {recommendedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -101,7 +97,6 @@ export function FashionRecommendations() {
                 key={product._id}
                 className="border border-gray-200/60 rounded-xl p-4 hover:shadow-md transition-all duration-300 group bg-white"
               >
-                {/* Product Image */}
                 <div className="bg-gray-100 h-40 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
                   {product.images && product.images.length > 0 ? (
                     <img
@@ -116,12 +111,10 @@ export function FashionRecommendations() {
                     </div>
                   )}
                   
-                  {/* Wishlist Button */}
                   <button className="absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white">
                     <Heart className="h-4 w-4 text-gray-400 hover:text-red-500 transition-colors" />
                   </button>
 
-                  {/* Rating Badge */}
                   <div className="absolute top-2 left-2">
                     <div className="bg-[#E6B84A] text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
                       <Star className="h-3 w-3 fill-current" />
@@ -130,7 +123,6 @@ export function FashionRecommendations() {
                   </div>
                 </div>
 
-                {/* Product Info */}
                 <div className="space-y-3">
                   <h3 className="font-medium text-gray-900 text-sm line-clamp-2 leading-tight">
                     {product.name}
@@ -146,17 +138,14 @@ export function FashionRecommendations() {
                     </div>
                   </div>
 
-                  {/* Add to Cart Button */}
                   <AddToCartButton
                     productId={product._id}
                     productName={product.name}
                     disabled={!product.isAvailable || product.quantity === 0}
                     size="sm"
                     className="w-full bg-[#5156D2] hover:bg-[#4645b5] text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    Add to Cart
-                  </AddToCartButton>
+                    showText={true}
+                  />
                 </div>
               </div>
             ))}

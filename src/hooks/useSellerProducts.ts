@@ -33,6 +33,13 @@ export function useSellerProducts(): UseSellerProductsReturn {
   const [error, setError] = useState('')
   const { token, user } = useAuthStore()
 
+  // ADD THIS: Function to get current category from URL
+  const getCurrentCategory = (): string => {
+    if (typeof window === 'undefined') return ''
+    const params = new URLSearchParams(window.location.search)
+    return params.get('category') || ''
+  }
+
   const loadProducts = async () => {
     try {
       setLoading(true)
@@ -58,6 +65,14 @@ export function useSellerProducts(): UseSellerProductsReturn {
             
             return false
           })
+        }
+        
+        // ADD THIS: Filter by category from URL
+        const currentCategory = getCurrentCategory()
+        if (currentCategory) {
+          filteredProducts = filteredProducts.filter(
+            (product: Product) => product.category?.toLowerCase() === currentCategory.toLowerCase()
+          )
         }
         
         setProducts(filteredProducts)
@@ -92,6 +107,19 @@ export function useSellerProducts(): UseSellerProductsReturn {
   useEffect(() => {
     loadProducts()
   }, [user?._id])
+
+  // ADD THIS: Listen for URL changes (when filter changes)
+  useEffect(() => {
+    const handleUrlChange = () => {
+      loadProducts() // Reload products when URL changes
+    }
+
+    window.addEventListener('popstate', handleUrlChange)
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange)
+    }
+  }, [])
 
   return {
     products,

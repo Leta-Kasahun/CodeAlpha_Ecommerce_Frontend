@@ -19,15 +19,31 @@ export const ShopProfile = () => {
   })
 
   useEffect(() => {
-    if (profile) {
-      setFormData({
+    if (!profile) return
+
+    setFormData(prev => {
+      const next = {
         shopName: profile.shopName || '',
         phoneForOrders: profile.phoneForOrders || '',
         bankName: profile.bankName || '',
         demoPayoutNumber: profile.demoPayoutNumber || '',
         shopAddress: profile.shopAddress || { city: '', postalCode: '', country: '' }
-      })
-    }
+      }
+
+      if (
+        prev.shopName === next.shopName &&
+        prev.phoneForOrders === next.phoneForOrders &&
+        prev.bankName === next.bankName &&
+        prev.demoPayoutNumber === next.demoPayoutNumber &&
+        prev.shopAddress.city === next.shopAddress.city &&
+        prev.shopAddress.postalCode === next.shopAddress.postalCode &&
+        prev.shopAddress.country === next.shopAddress.country
+      ) {
+        return prev
+      }
+
+      return next
+    })
   }, [profile])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -256,18 +272,14 @@ export const ShopProfile = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-gray-50 rounded-lg md:rounded-xl">
-                  <div className="p-2 sm:p-3 bg-[#E6B84A]/10 rounded-lg flex-shrink-0">
+                <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-6 bg-[#E6B84A]/10 rounded-lg md:rounded-xl">
+                  <div className="p-2 sm:p-3 rounded-lg flex-shrink-0">
                     <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#E6B84A]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs sm:text-sm md:text-base text-gray-600">Profile Completion</p>
                     <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-900">
-                      {[
-                        formData.shopName,
-                        formData.shopAddress.city, 
-                        formData.shopAddress.country
-                      ].filter(Boolean).length}/3
+                      {[formData.shopName, formData.shopAddress.city, formData.shopAddress.country].filter(Boolean).length}/3
                     </p>
                   </div>
                 </div>
