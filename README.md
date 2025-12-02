@@ -23,7 +23,7 @@ Watch a full walkthrough of the CodeAlpha E-Commerce Platform:
 
 Check out the full demo of my CodeAlpha E-Commerce Platform:
 
-[![Watch the Demo on YouTube](https://img.youtube.com/vi/CaILjjuTF3s/0.jpg)](https://youtu.be/CaILjjuTF3s)
+[![Watch the Demo on YouTube]([https://youtu.be/CaILjjuTF3s](https://youtu.be/CaILjjuTF3s)
 
 Or click here: [YouTube Demo Video](https://youtu.be/CaILjjuTF3s)
 
