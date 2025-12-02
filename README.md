@@ -19,7 +19,13 @@ A complete full-stack e-commerce solution built with modern technologies for the
 
 Watch a full walkthrough of the CodeAlpha E-Commerce Platform:
 
-[▶️ Watch the Demo on YouTube](https://youtu.be/HkTxJcv86y4](https://youtu.be/CaILjjuTF3s)
+## 🎥 Project Demo Video
+
+Check out the full demo of my CodeAlpha E-Commerce Platform:
+
+[![Watch the Demo on YouTube](https://img.youtube.com/vi/CaILjjuTF3s/0.jpg)](https://youtu.be/CaILjjuTF3s)
+
+Or click here: [YouTube Demo Video](https://youtu.be/CaILjjuTF3s)
 
 <video src="https://youtu.be/HkTxJcv86y4](https://youtu.be/CaILjjuTF3s" controls width="700">
 </video>
