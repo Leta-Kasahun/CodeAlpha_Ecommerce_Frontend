@@ -15,19 +15,16 @@ A complete full-stack e-commerce solution built with modern technologies for the
 ---
 <img width="1897" height="961" alt="Screenshot 2025-12-02 082503" src="https://github.com/user-attachments/assets/455ba61c-f116-47fc-857f-0595b46fbb6d" />
 ----
-## 🎥 Project Demo Video
-
-Watch a full walkthrough of the CodeAlpha E-Commerce Platform:
 
 ## 🎥 Project Demo Video
 
-Check out the full demo of my CodeAlpha E-Commerce Platform:
+Check out the full demo of my **CodeAlpha Social Media Platform**:
 
-[![Watch the Demo on YouTube]([https://youtu.be/CaILjjuTF3s](https://youtu.be/CaILjjuTF3s)
+[![Watch the Demo on YouTube](https://img.youtube.com/vi/KzJTL3B7aGw/0.jpg)](https://youtu.be/KzJTL3B7aGw)  
 
-Or click here: [YouTube Demo Video](https://youtu.be/CaILjjuTF3s)
+Or click here: [YouTube Demo Video](https://youtu.be/KzJTL3B7aGw)
 
-<video src="https://youtu.be/HkTxJcv86y4](https://youtu.be/CaILjjuTF3s" controls width="700">
+<video src="https://youtu.be/KzJTL3B7aGw" controls width="700">
 </video>
 
 ---
