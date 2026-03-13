@@ -37,10 +37,10 @@ export function useSearch(): UseSearchReturn {
       const response = await searchAPI.searchProducts(filters)
       setProducts(response.products)
       setTotal(response.total)
-      setPage(response.page || 1)
-      setHasNext(response.hasNext || false)
-      setHasPrev(response.hasPrev || false)
-    } catch (err) {
+      setPage('page' in response && typeof response.page === 'number' ? response.page : 1)
+      setHasNext('hasNext' in response ? Boolean(response.hasNext) : false)
+      setHasPrev('hasPrev' in response ? Boolean(response.hasPrev) : false)
+    } catch {
       setError('Failed to search products')
     } finally {
       setLoading(false)
@@ -51,18 +51,22 @@ export function useSearch(): UseSearchReturn {
     if (!query || query.length < 2) return []
     
     try {
-      const response = await searchAPI.getSearchSuggestions({ q: query })
-      return response.suggestions || []
-    } catch (err) {
+      const response = (await searchAPI.getSearchSuggestions({ q: query })) as
+        | string[]
+        | { suggestions?: string[] }
+      return Array.isArray(response) ? response : response.suggestions || []
+    } catch {
       return []
     }
   }, [])
 
   const getPopularSearches = useCallback(async (): Promise<string[]> => {
     try {
-      const response = await searchAPI.getPopularSearches()
-      return response.popularSearches || []
-    } catch (err) {
+      const response = (await searchAPI.getPopularSearches()) as
+        | string[]
+        | { popularSearches?: string[] }
+      return Array.isArray(response) ? response : response.popularSearches || []
+    } catch {
       return []
     }
   }, [])

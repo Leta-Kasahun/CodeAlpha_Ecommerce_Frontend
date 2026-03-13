@@ -12,7 +12,7 @@ interface ReviewFormProps {
   onCancel?: () => void
 }
 
-export const ReviewForm = ({ productId, onSubmit, loading, editReview, onCancel }: ReviewFormProps) => {
+export const ReviewForm = ({ onSubmit, loading, editReview, onCancel }: ReviewFormProps) => {
   const [rating, setRating] = useState(editReview?.rating || 0)
   const [comment, setComment] = useState(editReview?.comment || '')
 

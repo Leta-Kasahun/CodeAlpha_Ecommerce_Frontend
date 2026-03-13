@@ -17,8 +17,8 @@ export const useUserProfile = () => {
     setError(null)
     try {
       const response = await usersAPI.updateProfile(data, token)
-      if (response && response.success) {
-        updateUser(response.user) // Use updateUser instead of setUser
+      if (response) {
+        updateUser(response)
         return true
       }
       return false

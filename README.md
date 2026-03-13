@@ -201,7 +201,11 @@ CodeAlpha_Ecommerce_Frontend/
 │   │   │   ├─ layout.tsx
 │   │   │   └─ loading.tsx
 │   │   │
+<<<<<<< HEAD
 │   │   ├─ home/page.tsx
+=======
+│   │   ├─global-error.tsx
+>>>>>>> be17226 (build fixed)
 │   │   │
 │   │   ├─ products/
 │   │   │   └─ [id]/page.tsx

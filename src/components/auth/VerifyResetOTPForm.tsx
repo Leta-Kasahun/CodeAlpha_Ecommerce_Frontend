@@ -38,8 +38,8 @@ export function VerifyResetOTPForm() {
       otp: otpValue
     });
 
-    if (result?.success && result.data) {
-      const resetToken = result.data.resetToken || result.data;
+    if (result.success) {
+      const resetToken = result.data.resetToken;
       const resetUrl = `/reset-password?email=${encodeURIComponent(email)}&resetToken=${encodeURIComponent(resetToken)}`;
       router.push(resetUrl);
     }

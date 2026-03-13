@@ -6,13 +6,12 @@ import { SellerOrderStats } from './SellerOrderStatus'
 import { SellerOrderFilters } from './SellerOrderFilters'
 import { SellerOrdersTable } from './SellerOrderTable'
 import { useState, useMemo } from 'react'
-import { ShoppingCart, RefreshCw, FileText, Receipt } from 'lucide-react'
+import { ShoppingCart, RefreshCw, Receipt } from 'lucide-react'
 
 export function SellerOrders() {
   const {
     orders,
     loading,
-    error,
     pagination,
     updateOrderStatus,
     deleteOrder,
@@ -118,8 +117,12 @@ export function SellerOrders() {
       <SellerOrdersTable 
         orders={filteredOrders} 
         loading={loading}
-        onStatusUpdate={updateOrderStatus}
-        onDeleteOrder={deleteOrder}
+        onStatusUpdate={async (orderId, status) => {
+          await updateOrderStatus(orderId, status)
+        }}
+        onDeleteOrder={async (orderId) => {
+          await deleteOrder(orderId)
+        }}
         pagination={pagination}
         onPageChange={(page) => handleUpdateFilters({ page })}
       />

@@ -6,6 +6,8 @@ import { reviewsAPI } from '@/src/lib/api/reviews'
 import { useAuthStore } from '@/src/stores'
 import { Review, CreateReviewData, UpdateReviewData } from '@/src/types'
 
+type CreateReviewFormData = Omit<CreateReviewData, 'product'>
+
 export const useReviews = (productId?: string) => {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(false)
@@ -30,7 +32,7 @@ export const useReviews = (productId?: string) => {
     }
   }, [productId])
 
-  const createReview = useCallback(async (data: CreateReviewData) => {
+  const createReview = useCallback(async (data: CreateReviewFormData) => {
     if (!isAuthenticated || !token || !productId) {
       setError('Authentication required')
       return false

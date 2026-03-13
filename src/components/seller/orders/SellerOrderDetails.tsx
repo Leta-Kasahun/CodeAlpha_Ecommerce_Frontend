@@ -1,9 +1,8 @@
 // File: src/components/seller/orders/SellerOrderDetails.tsx
 'use client'
 
-import { SellerOrder } from '@/src/types/seller'
 import { useSellerOrder } from '@/src/hooks/useSellerOrder'
-import { X, Package, MapPin, CreditCard, User, Calendar, Truck, DollarSign } from 'lucide-react'
+import { X, Package, MapPin, CreditCard, User, Calendar, DollarSign } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect } from 'react'
 
@@ -175,9 +174,9 @@ export function SellerOrderDetails({ orderId, isOpen, onClose }: SellerOrderDeta
                   Order Items
                 </h3>
                 <div className="space-y-4">
-                  {order.orderItems.map((item, index) => (
+                  {order.orderItems.map((item) => (
                     <div key={item._id} className="flex items-center gap-6 p-4 bg-white rounded-lg border border-gray-200">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         {item.product.images?.[0] ? (
                           <Image 
                             src={item.product.images[0]} 

@@ -107,7 +107,7 @@ export const OrderDetails = ({ orderId }: OrderDetailsProps) => {
             {/* REMOVED: OrderActions - Users cannot update status */}
             <OrderStatusTimeline 
               order={order} 
-              onStatusUpdate={() => {}} // Empty function for users
+              onStatusUpdate={async () => {}} // No-op for users
             />
           </div>
         </div>

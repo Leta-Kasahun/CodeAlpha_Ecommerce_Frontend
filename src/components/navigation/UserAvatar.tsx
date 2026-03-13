@@ -1,11 +1,15 @@
 // File: src/components/navigation/UserAvatar.tsx - MINIMAL & CLEAN
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, ChevronDown, Mail, Settings } from 'lucide-react'
+import { LogOut, ChevronDown, Mail, Settings } from 'lucide-react'
 import { useAuthStore } from '@/src/stores'
 import { useRouter } from 'next/navigation'
 
-export function UserAvatar() {
+interface UserAvatarProps {
+  showName?: boolean
+}
+
+export function UserAvatar({ showName = true }: UserAvatarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const { user, logout } = useAuthStore()
@@ -43,10 +47,12 @@ export function UserAvatar() {
           </span>
         </div>
         
-        <div className="hidden sm:block text-left">
-          <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-          <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
-        </div>
+        {showName && (
+          <div className="hidden sm:block text-left">
+            <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+            <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+          </div>
+        )}
         
         <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>

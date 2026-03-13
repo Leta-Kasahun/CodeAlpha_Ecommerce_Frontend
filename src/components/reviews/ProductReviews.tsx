@@ -18,7 +18,7 @@ export const ProductReviews = ({ productId }: { productId: string }) => {
 
   useEffect(() => {
     fetchReviews()
-  }, [productId])
+  }, [productId, fetchReviews])
 
   useEffect(() => {
     const loadRatingStats = async () => {

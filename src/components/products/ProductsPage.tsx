@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useSearch } from '@/src/hooks/useSearch'
 import { useSorting } from '@/src/hooks/useSorting'
 import { useProductRatings } from '@/src/hooks/useProductRatings'
@@ -18,7 +18,6 @@ const sortOptions = [
 ]
 
 export function ProductsPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const { products, loading, error, searchProducts } = useSearch()
   const { sortedProducts, loading: sortLoading, error: sortError, sortMeta, sortProducts } = useSorting()
@@ -53,6 +52,7 @@ export function ProductsPage() {
     if (search) filters.q = search
     
     searchProducts(filters)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUseSortedResults(false)
   }, [category, search, searchProducts])
 
@@ -90,7 +90,7 @@ export function ProductsPage() {
     (productsWithRatings.length > 0 ? productsWithRatings : products)
   
   const displayLoading = loading || (useSortedResults && sortLoading)
-  const displayError = error || (useSortedResults && sortError)
+  const displayError = useSortedResults ? (sortError || '') : (error || '')
 
   const getCurrentSortLabel = () => {
     const option = sortOptions.find(opt => opt.value === currentSort)

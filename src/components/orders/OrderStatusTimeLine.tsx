@@ -9,7 +9,7 @@ interface OrderStatusTimelineProps {
   onStatusUpdate: (status: string) => Promise<void>;
 }
 
-export const OrderStatusTimeline = ({ order, onStatusUpdate }: OrderStatusTimelineProps) => {
+export const OrderStatusTimeline = ({ order }: OrderStatusTimelineProps) => {
   const statusSteps = [
     { 
       key: 'processing', 
@@ -45,11 +45,10 @@ export const OrderStatusTimeline = ({ order, onStatusUpdate }: OrderStatusTimeli
           const IconComponent = step.icon;
           const isCompleted = index < currentStepIndex;
           const isCurrent = index === currentStepIndex;
-          const isUpcoming = index > currentStepIndex;
 
           return (
             <div key={step.key} className="flex items-start gap-3">
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+              <div className={`shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center ${
                 isCompleted
                   ? 'bg-[#5156D2] border-[#5156D2]'
                   : isCurrent

@@ -3,7 +3,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { usersAPI } from '@/src/lib/api/users'
-import { SellerProfile } from '@/src/types/seller'
+import { SellerProfile } from '@/src/types'
 import { useAuthStore } from '@/src/stores'
 
 export const useShopProfile = () => {

@@ -4,6 +4,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useCallback } from 'react'
 import { productsAPI } from '@/src/lib/api/products'
 import { useAuthStore } from '@/src/stores'
 
@@ -16,6 +17,8 @@ export interface Product {
   description?: string
   images?: string[]
   isAvailable?: boolean
+  createdAt?: string
+  updatedAt?: string
   owner: any
 }
 
@@ -40,7 +43,7 @@ export function useSellerProducts(): UseSellerProductsReturn {
     return params.get('category') || ''
   }
 
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -79,12 +82,12 @@ export function useSellerProducts(): UseSellerProductsReturn {
       } else {
         setError('No products found')
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load products')
     } finally {
       setLoading(false)
     }
-  }
+  }, [user?._id])
 
   const deleteProduct = async (productId: string) => {
     if (!token) {
@@ -99,14 +102,14 @@ export function useSellerProducts(): UseSellerProductsReturn {
       } else {
         setError('Failed to delete product')
       }
-    } catch (err) {
+    } catch {
       setError('Failed to delete product')
     }
   }
 
   useEffect(() => {
     loadProducts()
-  }, [user?._id])
+  }, [loadProducts])
 
   // ADD THIS: Listen for URL changes (when filter changes)
   useEffect(() => {
@@ -119,7 +122,7 @@ export function useSellerProducts(): UseSellerProductsReturn {
     return () => {
       window.removeEventListener('popstate', handleUrlChange)
     }
-  }, [])
+  }, [loadProducts])
 
   return {
     products,

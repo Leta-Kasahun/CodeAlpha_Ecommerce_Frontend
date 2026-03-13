@@ -4,7 +4,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Calendar, ThumbsUp, MessageSquare, Edit3, Trash2, Image as ImageIcon } from 'lucide-react'
+import { Calendar, ThumbsUp, MessageSquare, Edit3, Trash2 } from 'lucide-react'
 import { useReviews } from '@/src/hooks/useReviews'
 import { useAuthStore } from '@/src/stores'
 import { ReviewForm } from '@/src/components/reviews/ReviewForm'
@@ -35,10 +35,14 @@ export function ReviewSection() {
   }
 
   const handleUpdate = async (data: { rating: number; comment: string }) => {
-    if (editingReview) {
-      await updateReview(editingReview._id, data)
+    if (!editingReview) return false
+
+    const success = await updateReview(editingReview._id, data)
+    if (success) {
       setEditingReview(null)
     }
+
+    return success
   }
 
   if (loading) {

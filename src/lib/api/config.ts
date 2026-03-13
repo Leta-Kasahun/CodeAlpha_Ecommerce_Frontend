@@ -1,7 +1,17 @@
  
 class ApiConfig {
   private getBaseUrl(): string {
-    return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+    const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+
+    if (configuredBaseUrl) {
+      return configuredBaseUrl.replace(/\/+$/, '');
+    }
+
+    if (process.env.NODE_ENV === 'production') {
+      return 'https://ca-ecommerce-api.onrender.com';
+    }
+
+    return 'http://localhost:5000';
   }
 
   private getTimeout(): number {
@@ -15,7 +25,8 @@ class ApiConfig {
   }
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.getBaseUrl()}${endpoint}`;
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${this.getBaseUrl()}${normalizedEndpoint}`;
     const timeout = this.getTimeout();
     
     const controller = new AbortController();

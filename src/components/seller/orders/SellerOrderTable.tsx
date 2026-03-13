@@ -111,30 +111,30 @@ export function SellerOrdersTable({
 
                 return (
                   <tr key={order._id} className="hover:bg-gray-50 transition-colors">
-                    {/* Product Column */}
+                    
                     <td className="py-4 px-6">
                       <div className="max-w-xs">
                         <p className="text-base font-medium text-gray-900 line-clamp-2">
-                          {mainItem?.product.name}
+                         {mainItem?.product?.name ?? ""}
                         </p>
                       </div>
                     </td>
 
-                    {/* Quantity Column */}
+                   
                     <td className="py-4 px-6">
                       <span className="text-base text-gray-900 font-medium">
                         {mainItem?.qty}
                       </span>
                     </td>
 
-                    {/* Price Column */}
+                    
                     <td className="py-4 px-6">
                       <span className="text-base font-medium text-[#5156D2]">
                         ${mainItem?.price}
                       </span>
                     </td>
 
-                    {/* Status Column */}
+                    
                     <td className="py-4 px-6">
                       {isEditing ? (
                         <select 
@@ -155,18 +155,18 @@ export function SellerOrdersTable({
                       )}
                     </td>
 
-                    {/* Customer Column */}
+                 
                     <td className="py-4 px-6">
                       <div className="max-w-xs">
-                        <p className="text-base font-medium text-gray-900 truncate">{order.user.name}</p>
-                        <p className="text-sm text-gray-600 truncate">{order.user.email}</p>
+                        <p className="text-base font-medium text-gray-900 truncate">{order?.user?.name ?? "Unknown"}</p>
+                        <p className="text-sm text-gray-600 truncate">{order?.user?.email ?? "No email"}</p>
                       </div>
                     </td>
 
-                    {/* Actions Column */}
+                    
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        {/* Status Action Button */}
+                       
                         {!isEditing && order.orderStatus !== 'completed' && (
                           <button
                             onClick={() => handleStatusUpdate(order._id, 
@@ -184,7 +184,7 @@ export function SellerOrdersTable({
                           </button>
                         )}
 
-                        {/* Action Icons */}
+                       
                         <div className="flex gap-1">
                           <button
                             onClick={() => setSelectedOrderId(order._id)}
@@ -218,7 +218,7 @@ export function SellerOrdersTable({
           </table>
         </div>
 
-        {/* Pagination */}
+       
         {pagination.pages > 1 && (
           <div className="border-t border-gray-200 px-4 lg:px-6 py-4">
             <div className="flex justify-center items-center gap-1 lg:gap-2 flex-wrap">
@@ -240,7 +240,7 @@ export function SellerOrdersTable({
         )}
       </div>
 
-      {/* Order Details Modal */}
+      
       {selectedOrderId && (
         <SellerOrderDetails
           orderId={selectedOrderId}

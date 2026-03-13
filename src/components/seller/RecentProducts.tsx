@@ -7,9 +7,14 @@ import { Eye, ShoppingCart, Star, Package } from 'lucide-react'
 export function RecentProducts() {
   const { products, loading } = useSellerProducts()
 
+  const getCreatedAtTime = (createdAt?: string) => {
+    if (!createdAt) return 0
+    return new Date(createdAt).getTime()
+  }
+
   // Get recent products (last 4 products)
   const recentProducts = products
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a, b) => getCreatedAtTime(b.createdAt) - getCreatedAtTime(a.createdAt))
     .slice(0, 4)
 
   if (loading) {
@@ -116,7 +121,7 @@ export function RecentProducts() {
                 )}
               </div>
               <span className="text-xs text-gray-500">
-                Added {new Date(product.createdAt).toLocaleDateString()}
+                Added {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'N/A'}
               </span>
             </div>
           </div>

@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Order } from '@/src/types'
 import { OrderStatusBadge } from '../../orders/OrderStatusBadge'
 import { PaymentStatusBadge } from '../../orders/PaymentStatusBadge'
-import { OrderActions } from '../../orders/OrderActions'
+import { OrderActions } from '@/src/components/orders/OrderActions'
 
 interface SellerOrderCardProps {
   order: Order

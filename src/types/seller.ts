@@ -11,6 +11,7 @@ export interface SellerOrder {
       name: string;
       price: number;
       owner: string;
+      images?: string[];
     };
     qty: number;
     price: number;

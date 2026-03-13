@@ -6,7 +6,6 @@ import { OrderStats } from './OrderStats';
 import { OrderList } from './OrderList';
 import { OrderHistory } from './OrderHistory';
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { Package, RefreshCw, History, Grid, Filter } from 'lucide-react';
 
 type ViewMode = 'list' | 'history';
@@ -18,14 +17,10 @@ export const OrderDashboard = () => {
   const {
     orders,
     loading,
-    error,
     filters,
-    updateOrderStatus,
     refetchOrders,
     updateFilters
   } = useOrders();
-
-  const router = useRouter();
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -175,7 +170,6 @@ export const OrderDashboard = () => {
             <OrderList 
               orders={filteredOrders} 
               loading={false}
-              onStatusUpdate={updateOrderStatus}
             />
           ) : (
             <OrderHistory 

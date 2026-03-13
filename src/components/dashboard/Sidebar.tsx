@@ -33,7 +33,10 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const { cart } = useCart()
 
   // REAL DATA
-  const cartItemsCount = cart?.items?.reduce((total, item) => total + item.qty, 0) || 0
+  const cartItemsCount = cart?.items?.reduce(
+    (total: number, item: { qty: number }) => total + item.qty,
+    0
+  ) || 0
   const pendingOrders = orders.filter(order => order.orderStatus === 'processing').length
 
   return (

@@ -1,9 +1,8 @@
 // File: src/hooks/useSellerProfile.ts
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { usersAPI } from '@/src/lib/api/users'
-import { User } from '@/src/types'
 import { useAuthStore } from '@/src/stores'
 
 export const useSellerProfile = () => {
@@ -18,8 +17,8 @@ export const useSellerProfile = () => {
     setError(null)
     try {
       const response = await usersAPI.updateProfile(data, token)
-      if (response && response.success) {
-        updateUser(response.user)
+      if (response) {
+        updateUser(response)
         return true
       }
       return false

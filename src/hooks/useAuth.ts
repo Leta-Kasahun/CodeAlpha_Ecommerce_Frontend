@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation';
 import { authAPI } from '@/src/lib/api';
 import { useAuthStore } from '@/src/stores';
 
+type VerifyResetOTPResult =
+  | { success: true; data: { resetToken: string } }
+  | { success: false; error: string };
+
 export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,15 +94,14 @@ export function useAuth() {
     }
   };
 
-  const handleVerifyResetOTP = async (data: any) => {
+  const handleVerifyResetOTP = async (data: any): Promise<VerifyResetOTPResult> => {
     setLoading(true);
     clearErrors();
 
     try {
       const result = await authAPI.verifyResetOTP(data);
 
-      // Handle various backend response structures safely
-      const resetToken = result.resetToken || result.token || result.passwordResetToken || result.data;
+      const resetToken = result.resetToken;
 
       if (resetToken) {
         return {

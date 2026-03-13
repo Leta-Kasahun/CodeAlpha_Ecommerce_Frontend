@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react'
 import { cartAPI } from '@/src/lib/api/cart'
 import { useAuthStore } from '@/src/stores'
 import { useCartStore } from '@/src/stores'  // ensure this import path matches your project
+import type { CartItem } from '@/src/types'
 
 export function useCart() {
   const [cart, setCart] = useState<any>({ items: [], total: 0 })
@@ -12,6 +13,13 @@ export function useCart() {
   const [error, setError] = useState('')
   const { token, isAuthenticated } = useAuthStore()
   const setCartStore = useCartStore.setState
+
+  const toStoreItems = (items: any[]): CartItem[] => {
+    return items.map((item: any) => ({
+      product: typeof item?.product === 'object' ? item.product?._id ?? '' : item?.product ?? '',
+      qty: Number(item?.qty) || 0,
+    }))
+  }
 
   const loadCart = useCallback(async () => {
     if (!isAuthenticated || !token) {
@@ -31,11 +39,12 @@ export function useCart() {
         total,
         raw: response.raw,
       })
+      const storeItems = toStoreItems(items)
       // mirror into global store so components using the store update too
       setCartStore({
-        items,
+        items: storeItems,
         total,
-        itemCount: response.totalItemsCount ?? items.reduce((s: number, it: any) => s + (Number(it.qty) || 0), 0)
+        itemCount: response.totalItemsCount ?? storeItems.reduce((s: number, it) => s + (Number(it.qty) || 0), 0)
       })
     } catch {
       setError('Failed to load cart')
