@@ -8,10 +8,10 @@ A complete full-stack e-commerce solution built with modern technologies for the
 
 
 ---
-###Seller Dahbord
+### Seller Dahbord
 <img width="1900" height="971" alt="Screenshot 2025-12-02 082200" src="https://github.com/user-attachments/assets/959d9af6-f285-430c-aaec-77d5f7876931" />
 ---
-###Client Dasboard
+### Client Dasboard
 ---
 <img width="1897" height="961" alt="Screenshot 2025-12-02 082503" src="https://github.com/user-attachments/assets/455ba61c-f116-47fc-857f-0595b46fbb6d" />
 ----
